@@ -1,0 +1,23 @@
+*********************************************************************************
+                           Universidad de Costa Rica
+                   Estructuras de Computadores Digitales II
+                          Tarea 1: Simulador de Caché
+                                  I Ciclo 2017
+Prof: Francisco Rivera
+
+Authors: Pablo Ávila B30724
+         Guido Armas B30xxx
+*********************************************************************************
+
+ESTRUCUTURA:
+
+	El simulador se compone de 2 clases "Cache" y "Block" divididas en headers ".h"
+	y definición ".cpp". Además un archivo main "Simulador.cpp" en donde se implementa
+	la funcionalidad de los 2 CPUs con su respectivo caché L1 y el caché L2 compartido.
+
+UTILIZACION:
+	
+	Para correr estos archivos se creó un Makefile el cual tiene las siguientes funciones:
+		make		   > 	Compila archivos y crea el ejecutable.
+		make run   > 	Corre el ejecutable creado "Simulador".
+		make clean >  Borra archivos temporales y ejecutables creados.
