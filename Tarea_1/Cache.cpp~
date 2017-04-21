@@ -4,25 +4,24 @@
 //                          Tarea 1: Simulador de Cache
 //                                  I Ciclo 2017
 //
-//                                    Cache.h
+//                                  Cache.cpp
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
 //          Guido Armas B30xxx
 //*********************************************************************************
 
-#include "Block.h"
+#include "Cache.h"
 
-#ifndef CACHE_H
-#define CACHE_H
+Cache::Cache(int bytes, int associativity){
+/*
+int LinesNumber = 900; // tenemos que calcularlo 
+set = new Block::Block [associativity];
 
-class Cache{
+*/
 
-public:
-	Block::block *set;
+}
 
-	Cache(int bytes, int associativity); // Size of cache in bytes, n-way associative
-	~Cache();
-
-};
-#endif
+Cache::~Cache(){
+	delete []data;
+}

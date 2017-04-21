@@ -19,7 +19,7 @@
 class Cache{
 
 public:
-	Block::block *set;
+	Block::block *line;
 
 	Cache(int bytes, int associativity); // Size of cache in bytes, n-way associative
 	~Cache();

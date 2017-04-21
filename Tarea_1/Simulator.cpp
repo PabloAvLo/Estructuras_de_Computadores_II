@@ -14,8 +14,10 @@
 #include <iostream>
 #include "Block.h"
 
-Block bloque1;
-Block bloque2;
+#define BLOCK_SIZE 32 // in bytes
+
+Block bloque1(BLOCK_SIZE);
+Block bloque2(BLOCK_SIZE);
 
 int main(int argc, char* argv[]){
 
@@ -33,6 +35,4 @@ int main(int argc, char* argv[]){
 	std::cout << std::endl;
 	std::cout << "Valid bit bloque 2: " << bloque2.valid << std::endl;
 	std::cout << "Tag bloque 2: " << bloque2.tag << std::endl;
-
-
 }

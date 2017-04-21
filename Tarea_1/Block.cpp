@@ -12,14 +12,25 @@
 //*********************************************************************************
 
 #include "Block.h"
+ 
+#define WORD_SIZE 32
+#define BYTE 8
+ 
+Block::Block( int size){
 
-Block::Block(){
 	valid = 0;
 	tag = 0;
+	dirty = 0;
+
+	int words = (size*BYTE)/WORD_SIZE;
+
+	data = new int [words];
 	
-	for(int i=0; i<8; i++){
+	for(int i=0; i<words; i++){
 		data[i] = 0;
 	}
 }
  
-Block::~Block(){}
+Block::~Block(){
+	delete []data;
+}
