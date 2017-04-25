@@ -19,7 +19,8 @@
 class Cache{
 
 public:
-	Block::block *set;
+	Block** set;
+	int LinesNumber;
 
 	Cache(int bytes, int associativity); // Size of cache in bytes, n-way associative
 	~Cache();

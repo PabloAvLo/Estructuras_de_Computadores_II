@@ -12,16 +12,27 @@
 //*********************************************************************************
 
 #include "Cache.h"
+#include "Block.h"
 
 Cache::Cache(int bytes, int associativity){
-/*
-int LinesNumber = 900; // tenemos que calcularlo 
-set = new Block::Block [associativity];
 
-*/
+	LinesNumber = 900; // tenemos que calcularlo 
+	set = new Block* [LinesNumber]; 
+	
+	for (int i=0; i<LinesNumber; i++){
+		set[i] = new Block [associativity];	
 
+		for (int j=0; j<associativity; j++){
+			set [i][j].data[2] = 590;
+		}
+	}
 }
-
+	
+	
+//Destructor
 Cache::~Cache(){
-	//delete []data;
+	for (int i=0; i < LinesNumber; i++){
+		delete[] set [i];
+	}
+	delete[] set;
 }

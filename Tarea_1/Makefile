@@ -11,7 +11,7 @@
 #          Guido Armas B30xxx
 #*********************************************************************************
 
-OBJS_1= Simulator.cpp Block.cpp Block.h
+OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h	
 
 CC_1= g++
 

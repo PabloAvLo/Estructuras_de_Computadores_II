@@ -22,7 +22,7 @@ public:
 	int tag;
 	int *data; // The block is 32B, then contains 8 words of 32b (int type size).
 
-	Block(int bytes); // Size of cache in bytes
+	Block();
 	~Block();
 };
 #endif
