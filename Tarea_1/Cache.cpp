@@ -15,7 +15,8 @@
 
 Cache::Cache(int bytes, int associativity){
 
-	LinesNumber = 900; // tenemos que calcularlo 
+	LinesNumber = bytes/ (BLOCK_SIZE * associativity); 
+
 	set = new Block* [LinesNumber]; 
 	
 	for (int i=0; i<LinesNumber; i++){

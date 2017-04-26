@@ -17,6 +17,9 @@
 
 using namespace std;
 
+#define WORD_SIZE 32   // Bits
+#define BLOCK_SIZE 32  // Bytes
+
 #ifndef BLOCK_H
 #define BLOCK_H
 

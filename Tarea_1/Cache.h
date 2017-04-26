@@ -13,10 +13,6 @@
 
 #include "Block.h"
 
-#define TAG_SIZE_L1 8
-#define INDEX_SIZE_L1 11
-#define OFFSET_SIZE_L1 5
-
 #ifndef CACHE_H
 #define CACHE_H
 
