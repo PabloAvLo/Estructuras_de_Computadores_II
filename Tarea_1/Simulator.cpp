@@ -8,42 +8,46 @@
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
-//          Guido Armas B30xxx
+//          Guido Armas B30647
 //*********************************************************************************
 
-#include <iostream>
-#include "Block.h"
 #include "Cache.h"
 
-#define BLOCK_SIZE 32 // in bytes
-
-//Block bloque1(BLOCK_SIZE);
-//Block bloque2(BLOCK_SIZE);
-
-Block bloque1;
-Block bloque2;
+using namespace std;
 
 Cache L1(64000,2);
 
 int main(int argc, char* argv[]){
+	
+	string fileCPU1 = "mem_trace_core1.txt";
+	string fileCPU2 = "mem_trace_core2.txt";
 
-	bloque2.valid = 1;
-	bloque2.tag = 10011;
+	int sizeCPU1 = L1.getFileLines(fileCPU1);
+	int sizeCPU2 = L1.getFileLines(fileCPU2);
+	
+	string** instructionsCPU1;
+	string** instructionsCPU2;
+
+	instructionsCPU1 = L1.getFileData(fileCPU1, sizeCPU1);
+	instructionsCPU2 = L1.getFileData(fileCPU2, sizeCPU2);
 
 /*
-	std::cout << "Hello World" << std::endl;
-	std::cout << "Valid bit bloque 1: " << bloque1.valid << std::endl;
-	std::cout << "Tag bloque 1: " << bloque1.tag << std::endl << "Block 1 Data: ";
-*/
-	std::cout << "Tag bloque 1, set 1: " << L1.set[300][1].data[2] << std::endl;
-
-	/*
-	for(int i=0; i<8; i++){
-		std::cout << bloque1.data[i];
+	for(int i=0; i<sizeCPU1; i++){
+		cout <<"Direccion String Hexadecimal: "<< instructionsCPU1[i][0] << " Lectura/Escritura: "<< instructionsCPU1 [i][1] <<endl; 
 	}
-	std::cout << std::endl;
-	std::cout << "Valid bit bloque 2: " << bloque2.valid << std::endl;
-	std::cout << "Tag bloque 2: " << bloque2.tag << std::endl;
 */
 
-}
+string hexAddr;
+
+int** Address;
+Address = new int* [sizeCPU1];
+
+	for(int i=0; i< sizeCPU1; i++){
+	
+		hexAddr =	L1.hexToBin(instructionsCPU1[i][0]);
+		Address[i] = L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);	
+		
+		cout<<"Tag: "<< Address[i][0] <<" Index: "<< Address[i][1] <<" Offset: "<< Address[i][2]<<endl;  
+	}		
+} 
+

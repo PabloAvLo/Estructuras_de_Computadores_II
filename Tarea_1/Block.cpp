@@ -8,7 +8,7 @@
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
-//          Guido Armas B30xxx
+//          Guido Armas B30647
 //*********************************************************************************
 
 #include "Block.h"

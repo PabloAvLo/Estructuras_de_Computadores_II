@@ -8,10 +8,14 @@
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
-//          Guido Armas B30xxx
+//          Guido Armas B30647
 //*********************************************************************************
 
 #include "Block.h"
+
+#define TAG_SIZE_L1 8
+#define INDEX_SIZE_L1 11
+#define OFFSET_SIZE_L1 5
 
 #ifndef CACHE_H
 #define CACHE_H
@@ -24,6 +28,11 @@ public:
 
 	Cache(int bytes, int associativity); // Size of cache in bytes, n-way associative
 	~Cache();
+	
+	int getFileLines(string file);
+	string** getFileData(string file, int size);
+	string hexToBin(string sHex);
+	int* binToInt(int tag_size, int index_size, int offset_size, string strBin);	
 
 };
 #endif

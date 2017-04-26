@@ -8,12 +8,12 @@
 #
 # Prof: Francisco Rivera
 # Authors: Pablo Avila B30724
-#          Guido Armas B30xxx
+#          Guido Armas B30647
 #*********************************************************************************
 
 OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h	
 
-CC_1= g++
+CC_1= g++ -std=c++0x
 
 TARGET_1 = Simulador
 

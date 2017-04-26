@@ -8,8 +8,14 @@
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
-//          Guido Armas B30xxx
+//          Guido Armas B30647
 //*********************************************************************************
+
+#include <string>
+#include <fstream>
+#include <iostream>
+
+using namespace std;
 
 #ifndef BLOCK_H
 #define BLOCK_H
