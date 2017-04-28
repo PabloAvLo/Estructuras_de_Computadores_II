@@ -16,7 +16,7 @@
 #include "Mesi.h"
 using namespace std;
 
-Mesi::Mesi(int estado, bool copies, bool ubicacion, string evento){
+Mesi::Mesi(int estado, char evento, int * vdArray){
 
 //Inicializar estado en invalido
 	estado = 0;
@@ -28,7 +28,9 @@ Mesi::Mesi(int estado, bool copies, bool ubicacion, string evento){
 //La variable evento esta compuesta de la manera n-OP
 //n: indica de cual CPU viene la instruccion
 //O: indica la operacion solicitada, L o S
-	evento = "00";
+	evento = '0';
+  vdArray[0] = 0;
+  vdArray[1] = 0;
 }
 
 //Descripcion:
@@ -44,6 +46,7 @@ Mesi::Mesi(int estado, bool copies, bool ubicacion, string evento){
 //0/Invalido, 1/Exclusivo, 2/Modificado, 3/Scompartido
 //evento: caracter, L/lectura, S/escritura
 //contadorRead/Write: constantes utilizadas para calcular el hit/miss rate
+//vdArray: array de 2 elementos, contiene el bit de VALID y DIRTY, en ese orden
 
 //Eventos:
 //read: se quiere leer una linea del cache
@@ -52,13 +55,12 @@ Mesi::Mesi(int estado, bool copies, bool ubicacion, string evento){
 //Salidas:
 //La funcion retorna la variable estado, con el estado de la linea de cache
 
+//Siguientes 3 lineas van en main
+//int contadorRead, contadorWrite;
+//contadorRead = 0;
+//contadorWrite = 0;
 
-int contadorRead, contadorWrite;
-
-contadorRead = 0;
-contadorWrite = 0;
-
-int estadoMESI (char evento) {
+int* estadoMESI (char evento) {
 
 	if (estado = 0){
 		copies = 0;
@@ -98,7 +100,7 @@ int estadoMESI (char evento) {
 		//El proximo estado depende de estado y de eventos (L/S)
 		switch (estado) {
 			case 0:
-				if (evento.at(1) = 'L'){
+				if (evento == 'L'){
 					contadorRead = contadorRead + 1;
 					estado = 0;
 				}
@@ -108,7 +110,7 @@ int estadoMESI (char evento) {
 				}
 			break;
 			case 1:
-				if (evento.at(1) == 'L'){
+				if (evento == 'L'){
 					estado = 3;
 					contadorRead = contadorRead + 1;
 				}
@@ -118,7 +120,7 @@ int estadoMESI (char evento) {
 				}
 			break;
 			case 2:
-				if (evento.at(1) == 'L') {
+				if (evento == 'L') {
 					estado = 3;
 					contadorRead = contadorRead + 1;
 				}
@@ -128,7 +130,7 @@ int estadoMESI (char evento) {
 				}
 			break;
 			case 3:
-				if (evento.at(1) == 'L') {
+				if (evento == 'L') {
 					estado == 3;
 					contadorRead = contadorRead + 1;
 				}
@@ -147,7 +149,7 @@ int estadoMESI (char evento) {
 		//Request local
 		switch (estado) {
 			case 0:
-				if (evento.at(1) == 'L'){
+				if (evento == 'L'){
 					if (copies) {
 					//Lectura y ya hay copias del dato en otro cache
 						estado = 3;
@@ -162,7 +164,7 @@ int estadoMESI (char evento) {
 				estado = 2;
 			break;
 			case 1:
-				if (evento.at(1) == 'L'){
+				if (evento == 'L'){
 					estado = 1;
 					contadorRead = contadorRead + 1;
 				}
@@ -172,7 +174,7 @@ int estadoMESI (char evento) {
 				}
 			break;
 			case 2:
-				if (evento.at(1) == 'L'){
+				if (evento == 'L'){
 					estado = 2;
 					contadorRead = contadorRead + 1;
 				}
@@ -182,7 +184,7 @@ int estadoMESI (char evento) {
 				}
 			break;
 			case 3:
-				if (evento.at(1) == 'L'){
+				if (evento == 'L'){
 					estado == 3;
 					contadorRead = contadorRead + 1;
 				}
@@ -200,25 +202,26 @@ int estadoMESI (char evento) {
   //trslacion de estados mesi a bits de valid y dirty
  switch (estado) {
    case 0:
-      valid = 0;
+      vdArray[0] = 0;
     break;
 
     case 1:
-        valid = 1;
-        dirty = 0;
+        vdArray[0] = 1;
+        vdArray[1] = 0;
     break;
 
     case 2:
-        dirty = 1;
+        vdArray[1] = 1;
     break;
 
     case 3:
-        valid = 1;
-        dirty = 0;
+        vdArray[0] = 1;
+        vdArray[1] = 0;
     break;
  }
-
-	return estado;
+//MESI retorna los valores de VALID y DIRTY, para ser usados en el calculo
+//del miss y hit rate
+	return vdArray;
 }
 
 //Destructor
