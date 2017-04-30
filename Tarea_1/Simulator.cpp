@@ -36,15 +36,15 @@ int main(int argc, char* argv[]){
 	contadorHit = 0;
 	contadorMiss = 0;
 
-//	cout<<"Numero de lineas del cache L1: "<< CPU1_L1.LinesNumber <<endl;	
+//	cout<<"Numero de lineas del cache L1: "<< CPU1_L1.LinesNumber <<endl;
 //	cout<<"Numero de lineas del cache L2: "<< L2.LinesNumber <<endl;
-	
+
 	string fileCPU1 = "mem_trace_core1.txt";
 	string fileCPU2 = "mem_trace_core2.txt";
 
 	int sizeCPU1 = CPU1_L1.getFileLines(fileCPU1);
 	int sizeCPU2 = CPU2_L1.getFileLines(fileCPU2);
-	
+
 	string** instructionsCPU1;
 	string** instructionsCPU2;
 
@@ -53,7 +53,7 @@ int main(int argc, char* argv[]){
 
 /*
 		for(int i=0; i<sizeCPU1; i++){
-			cout <<"Direccion String Hexadecimal: "<< instructionsCPU1[i][0] << " Lectura/Escritura: "<< instructionsCPU1 [i][1] <<endl; 
+			cout <<"Direccion String Hexadecimal: "<< instructionsCPU1[i][0] << " Lectura/Escritura: "<< instructionsCPU1 [i][1] <<endl;
 		}
 */
 
@@ -63,21 +63,21 @@ int main(int argc, char* argv[]){
 	AddressCPU2 = new int* [sizeCPU2];
 
 	string hexAddr="";
-	
+
 	for(int i=0; i< sizeCPU1; i++){
 		hexAddr =	CPU1_L1.hexToBin(instructionsCPU1[i][0]);
-		AddressCPU1[i] = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);	
-		cout<<"CPU1   Tag: "<< AddressCPU1[i][0] <<" Index: "<< AddressCPU1[i][1] <<" Offset: "<< AddressCPU1[i][2]<<endl;  
+		AddressCPU1[i] = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);
+		cout<<"CPU1   Tag: "<< AddressCPU1[i][0] <<" Index: "<< AddressCPU1[i][1] <<" Offset: "<< AddressCPU1[i][2]<<endl;
 	}
-	
+
 	hexAddr="";
 
 	for(int i=0; i< sizeCPU2; i++){
 		hexAddr =	CPU2_L1.hexToBin(instructionsCPU2[i][0]);
-		AddressCPU2[i] = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);	
-//		cout<<"CPU2   Tag: "<< AddressCPU2[i][0] <<" Index: "<< AddressCPU2[i][1] <<" Offset: "<< AddressCPU2[i][2]<<endl;  
+		AddressCPU2[i] = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);
+//		cout<<"CPU2   Tag: "<< AddressCPU2[i][0] <<" Index: "<< AddressCPU2[i][1] <<" Offset: "<< AddressCPU2[i][2]<<endl;
 	}
-	
+
 
 
 	char miss_hit_leido =CPU1_L1.read(AddressCPU2[0][1], AddressCPU2[0][0]);
@@ -86,7 +86,151 @@ int main(int argc, char* argv[]){
 	}
 	else contadorMiss +=1;
 
-		cout<<"Misses "<< contadorMiss <<" Hits "<< contadorHit <<endl;  
-					
-} 
+		cout<<"Misses "<< contadorMiss <<" Hits "<< contadorHit <<endl;
 
+//Maquina de estados mesi
+//Determinar el estado Mesi
+//Iincializar en el estado invalido, sin copias de un dato en ningun cache
+	int estadoL1_1 = 0;
+	int estadoL1_2 = 0;
+	bool copies_L1 = false;
+	bool copies_L2 = false;
+	int* validDirtyL1_1;
+	int* validDirtyL1_2;
+	validDirtyL1_1 = new int [2];
+	validDirtyL1_2 = new int [2];
+	string read = "L";
+	string write = "S";
+
+	for (int i=0; i < sizeCPU1; i++){
+		//casos READ de CPU1
+		if (instructionsCPU1[i][1].compare(read) == 0){
+			if (estadoL1_1 == 0){
+				if (estadoL1_2 == 0){
+					estadoL1_2 = 0;
+					if (copies_L1 == false){
+						estadoL1_1 = 1;
+					}
+					else {
+						estadoL1_1 = 3;
+					}
+				}
+				else {
+					estadoL1_2 = 3;
+				}
+			}
+
+			if (estadoL1_1 == 1){
+				estadoL1_1 = 1;
+				if (estadoL1_2 == 0){
+					estadoL1_2 = 0;
+				}
+				else {
+					estadoL1_2 = 3;
+				}
+			}
+
+			if (estadoL1_1 == 2){
+				estadoL1_1 = 0;
+				if (estadoL1_2 == 0){
+					estadoL1_2 = 0;
+				}
+				else {
+					estadoL1_2 = 3;
+				}
+			}
+
+			if (estadoL1_1 == 3){
+				estadoL1_1 = 3;
+				if (estadoL1_2 == 0){
+					estadoL1_2 = 0;
+				}
+				else {
+					estadoL1_2 = 3;
+				}
+			}
+		}
+
+		//casos WRITE de CPU1
+		if (instructionsCPU1[i][1].compare(write) == 0){
+			estadoL1_2 = 0;
+			estadoL1_1 = 2;
+		}
+
+		//casos READ de CPU2
+		if (instructionsCPU2[i][1].compare(read) == 0){
+			if (estadoL1_2 == 0){
+				if (estadoL1_1 == 0){
+					estadoL1_1 = 0;
+					if (copies_L2 == false){
+						estadoL1_2 = 1;
+					}
+					else {
+						estadoL1_2 = 3;
+					}
+				}
+				else {
+					estadoL1_1 = 3;
+				}
+			}
+
+			if (estadoL1_2 == 1){
+				estadoL1_2 = 1;
+				if (estadoL1_1 == 0){
+					estadoL1_1 = 0;
+				}
+				else {
+					estadoL1_1 = 3;
+				}
+			}
+
+			if (estadoL1_2 == 2){
+				estadoL1_2 = 0;
+				if (estadoL1_1 == 0){
+					estadoL1_1 = 0;
+				}
+				else {
+					estadoL1_1 = 3;
+				}
+			}
+
+			if (estadoL1_2 == 3){
+				estadoL1_2 = 3;
+				if (estadoL1_1 == 0){
+					estadoL1_1 = 0;
+				}
+				else {
+					estadoL1_1 = 3;
+				}
+			}
+		}
+
+		//casos WRITE de CPU2
+		if (instructionsCPU2[i][1].compare(write) == 0){
+			estadoL1_1 = 0;
+			estadoL1_2 = 2;
+		}
+
+		//Determinar el valor de copies, hay copias en todo caso excepto
+		//cuando el dato es invalido
+		if (estadoL1_1 == 0){
+			copies_L1 = 0;
+		}
+		else {
+			copies_L1 = 1;
+		}
+
+		if (estadoL1_2 == 0){
+			copies_L2 = 0;
+		}
+		else {
+			copies_L2 = 1;
+		}
+
+		//Traslacion de estados MESI a bits de valid y dirty
+		//validDirtyL1_1[0] = bit de valido de L1_1 / validDirtyL1_1[1] = bit de dirty de L1_2
+		validDirtyL1_1 = CPU1_L1.mesiToValidDirty(estadoL1_1);
+		validDirtyL1_2 = CPU2_L1.mesiToValidDirty(estadoL1_2);
+	}
+
+}

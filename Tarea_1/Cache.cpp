@@ -15,20 +15,20 @@
 
 Cache::Cache(int bytes, int associativity){
 
-	LinesNumber = bytes/ (BLOCK_SIZE * associativity); 
-	this->associativity = associativity;	
-	
-	set = new Block* [LinesNumber]; 
-	
+	LinesNumber = bytes/ (BLOCK_SIZE * associativity);
+	this->associativity = associativity;
+
+	set = new Block* [LinesNumber];
+
 	for (int i=0; i<LinesNumber; i++){
-		set[i] = new Block [associativity];	
+		set[i] = new Block [associativity];
 
 		for (int j=0; j<associativity; j++){
 			set [i][j].data[2] = 590;
 		}
 	}
 }
-	
+
 //Destructor
 Cache::~Cache(){
 
@@ -62,31 +62,31 @@ string** Cache::getFileData(string &file, int &size){
 	}
 
 	string line;
-	string hexa;	
+	string hexa;
 
 	ifstream data(file);
-	
-	if(data.is_open()){ 
+
+	if(data.is_open()){
 		int j=0;
-  	
+
   	while(!data.eof()){ // To get you all the lines.
-  
-  		getline(data,line); // Saves the line in STRING.      
+
+  		getline(data,line); // Saves the line in STRING.
 			hexa = "";
 			if (line.length() > 1){
-				for(int i=2; i< ( line.length() -3); i++) {				
-					hexa = hexa + line.at(i);  
+				for(int i=2; i< ( line.length() -3); i++) {
+					hexa = hexa + line.at(i);
 			  }
-			  
+
 			  // int value = stoi(hexa, nullptr,16);
 			  dataArray [j][0] = hexa;
 			  dataArray [j][1] = line.at(line.length() -2);
-			 
+
    		}
    		j++;
     }
 		data.close();
-	}	
+	}
 
 return dataArray;
 }
@@ -94,11 +94,11 @@ return dataArray;
 string Cache::hexToBin(string &sHex){
 
 	string sReturn = "";
-	
+
 	while (sHex.length() < 6){
 			sHex = "0" + sHex;
 	}
-	
+
 	for (int i = 0; i < sHex.length (); ++i)
 	{
 		switch (sHex [i])
@@ -138,12 +138,47 @@ int* Cache::binToInt(int tag_size, int index_size, int offset_size, string &strB
 	int tag_dec = std::stoi(tag_bin, nullptr , 2);
 	int index_dec = std::stoi(index_bin, nullptr , 2);
 	int offset_dec = std::stoi(offset_bin, nullptr , 2);
-	
+
 	addrInt[0] = tag_dec;
 	addrInt[1] = index_dec;
 	addrInt[2] = offset_dec;
-	
+
 return addrInt;
+}
+
+int * Cache::mesiToValidDirty (int estado){
+  //traslacion de estados mesi a bits de valid y dirty, una vez determinados
+  //los nuevos estados
+
+int * vdArray;
+vdArray = new int [2];
+
+//En el switch, no se abarcan todos las asignaciones a valid y dirty.
+//Cuando esto sucede, es porque el estado del bit no asignado no importa
+//para el calculo de si hay un hit/miss
+ switch (estado) {
+   case 0:
+        vdArray[0] = 0;
+    break;
+
+    case 1:
+        vdArray[0] = 1;
+        vdArray[1] = 0;
+    break;
+
+    case 2:
+        vdArray[1] = 1;
+    break;
+
+    case 3:
+        vdArray[0] = 1;
+        vdArray[1] = 0;
+    break;
+ }
+
+ //MESI retorna los valores de VALID y DIRTY, para ser usados en el calculo
+ //del miss y hit rate
+ 	return vdArray;
 }
 
 /*
@@ -153,7 +188,7 @@ void Cache::write(int &index, int &tag, int &dato){
 
 	for (int i=0; i< this->associativity; i++){
 		if(this->set[i][index].valid == true)
-	
+
 		if(tag == this->set[i][index].tag){
 			for(int j=0; j<(BLOCK_SIZE/WORD_SIZE); j++){
 				dataBlock[j] = this->set[i][index].data[j];
@@ -170,18 +205,14 @@ if(this->set[i][index].tag ==1)
 */
 
 char Cache::read(int &index, int &tag){
-	
+
 	char hit_miss='m';
 
 	for (int i=0; i< this->associativity; i++){
 		if((tag == this->set[i][index].tag) && (this->set[i][index].valid == true) && (this->set[i][index].dirty == false)){
-			hit_miss = 'h';	
+			hit_miss = 'h';
 			break;
-		} 
+		}
 	}
 	return hit_miss;
 }
-
-
-
-
