@@ -147,38 +147,38 @@ return addrInt;
 }
 
 int * Cache::mesiToValidDirty (int estado){
-  //traslacion de estados mesi a bits de valid y dirty, una vez determinados
-  //los nuevos estados
+//traslacion de estados mesi a bits de valid y dirty, una vez determinados
+//los nuevos estados
 
-int * vdArray;
-vdArray = new int [2];
+	int * vdArray;
+	vdArray = new int [2];
 
 //En el switch, no se abarcan todos las asignaciones a valid y dirty.
 //Cuando esto sucede, es porque el estado del bit no asignado no importa
 //para el calculo de si hay un hit/miss
- switch (estado) {
-   case 0:
-        vdArray[0] = 0;
-    break;
+	 switch (estado) {
+		 case 0:
+		      vdArray[0] = 0;
+		  break;
 
-    case 1:
-        vdArray[0] = 1;
-        vdArray[1] = 0;
-    break;
+		  case 1:
+		      vdArray[0] = 1;
+		      vdArray[1] = 0;
+		  break;
 
-    case 2:
-        vdArray[1] = 1;
-    break;
+		  case 2:
+		      vdArray[1] = 1;
+		  break;
 
-    case 3:
-        vdArray[0] = 1;
-        vdArray[1] = 0;
-    break;
- }
+		  case 3:
+		      vdArray[0] = 1;
+		      vdArray[1] = 0;
+		  break;
+	 }
 
- //MESI retorna los valores de VALID y DIRTY, para ser usados en el calculo
- //del miss y hit rate
- 	return vdArray;
+//MESI retorna los valores de VALID y DIRTY, para ser usados en el calculo
+//del miss y hit rate
+	return vdArray;
 }
 
 /*
@@ -204,15 +204,34 @@ if(this->set[i][index].tag ==1)
 }
 */
 
-char Cache::read(int &index, int &tag){
+int Cache::read(string &dir, Cache &nextLevel){
+	
+	int hit_miss=0;
+	bool found= false;
+	int* addrInt;
+	addrInt = new int [3];
 
-	char hit_miss='m';
-
+		addrInt = Cache::binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, dir);	
+//		cout<<"CPU1   Tag: "<< AddressCPU1[i][0] <<" Index: "<< AddressCPU1[i][1] <<" Offset: "<< AddressCPU1[i][2]<<endl;  
+	
 	for (int i=0; i< this->associativity; i++){
-		if((tag == this->set[i][index].tag) && (this->set[i][index].valid == true) && (this->set[i][index].dirty == false)){
-			hit_miss = 'h';
+		if((addrInt[0] == this->set[i][addrInt[1]].tag) && (this->set[i][addrInt[1]].valid == true) && (this->set[i][addrInt[1]].dirty == false)){
+			hit_miss = 1;	
+			found = true;
 			break;
-		}
+		} 
 	}
+	
+	if(found !=true){
+		addrInt = Cache::binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, dir);	
+		
+		for (int i=0; i< nextLevel.associativity; i++){
+			if((addrInt[0] == nextLevel.set[i][addrInt[1]].tag) && (nextLevel.set[i][addrInt[1]].valid == true) && (nextLevel.set[i][addrInt[1]].dirty == false)){
+				hit_miss = 2;	
+				break;
+			}
+		}	
+	}
+	
 	return hit_miss;
 }

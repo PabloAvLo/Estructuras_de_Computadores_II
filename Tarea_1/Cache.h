@@ -13,6 +13,16 @@
 
 #include "Block.h"
 
+#define CACHE_L1_SIZE 16384 //16kB = 2^14 Bytes
+#define TAG_SIZE_L1 11 // Bits
+#define INDEX_SIZE_L1 8 // Bits
+#define OFFSET_SIZE_L1 5  // Bits
+
+#define CACHE_L2_SIZE 131072 // 128kB = 2^17 Bytes
+#define TAG_SIZE_L2 7 // Bits
+#define INDEX_SIZE_L2 12 // Bits
+#define OFFSET_SIZE_L2 5  // Bits
+
 #ifndef CACHE_H
 #define CACHE_H
 
@@ -52,20 +62,21 @@ public:
 	int* binToInt(int tag_size, int index_size, int offset_size, string &strBin);
 
 // La funcion write escribe en la linea [index] del cache L1 respectivo, un dato,
-// (en este caso se usara el offset de la direccion como dato ya que el archivo
-// a leer solo contenia direcciones y la instruccion L/S).
-// Si la posicion esta vacia, solo lo escribe ahi, pero si el bloque tiene ya un
-// dato escrito, este se escribira en la cache L2 antes de escribir el dato nuevo
-// en L1.
+// (en este caso se usara el offset de la direccion como dato ya que el archivo 
+// a leer solo contenia direcciones y la instruccion L/S). 
+// Si la posicion esta vacia, solo lo escribe ahi, pero si el bloque tiene ya un 
+// dato escrito, este se escribira en la cache L2 antes de escribir el dato nuevo 
+// en L1. 
 // @Parametro Index: Index de la direccion a escribir.
 // @Parametro Tag: Valor de etiqueta para comparar.
-//	void write(int &index int &tag, int &dato);
+//	void write(int &index, int &tag, int &dato);
 
 // Esta funcion se encarga de leer los datos de un bloque del cache respectivo,
-// y si ocurrio un miss o un hit.
-// @Parametro Index: Posicion en el arreglo a leer.
-// @Parametro Tag: Valor de etiqueta para comparar.
-	char read(int &index, int &tag);
+// y retorna si ocurrio un miss o un hit en cada nivel de memoria.
+// @Parametro Dir: String de direccion en binario.
+// @Parametro nextLevel: Siguiente nivel de memoria para leer en caso de miss.
+	int read(string &dir, Cache &nextLevel);
+
 	int* mesiToValidDirty (int estado);
 
 };
