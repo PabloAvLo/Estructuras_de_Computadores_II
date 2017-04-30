@@ -12,6 +12,17 @@
 //*********************************************************************************
 
 #include "Cache.h"
+//#include "Mesi.h"
+
+#define CACHE_L1_SIZE 16384 //16kB = 2^14 Bytes
+#define TAG_SIZE_L1 11 // Bits
+#define INDEX_SIZE_L1 8 // Bits
+#define OFFSET_SIZE_L1 5  // Bits
+
+#define CACHE_L2_SIZE 131072 // 128kB = 2^17 Bytes
+#define TAG_SIZE_L2 7 // Bits
+#define INDEX_SIZE_L2 12 // Bits
+#define OFFSET_SIZE_L2 5  // Bits
 
 using namespace std;
 
@@ -21,11 +32,9 @@ Cache L2(CACHE_L2_SIZE, 1);
 
 int main(int argc, char* argv[]){
 
-	int contadorHit_L1, contadorMiss_L1, contadorHit_L2, contadorMiss_L2;
-	contadorHit_L1 = 0;
-	contadorMiss_L1 = 0;
-	contadorHit_L2 = 0;
-	contadorMiss_L2 = 0;
+	int contadorHit, contadorMiss;
+	contadorHit = 0;
+	contadorMiss = 0;
 
 //	cout<<"Numero de lineas del cache L1: "<< CPU1_L1.LinesNumber <<endl;
 //	cout<<"Numero de lineas del cache L2: "<< L2.LinesNumber <<endl;
@@ -48,26 +57,36 @@ int main(int argc, char* argv[]){
 		}
 */
 
+	int** AddressCPU1;
+	int** AddressCPU2;
+	AddressCPU1 = new int* [sizeCPU1];
+	AddressCPU2 = new int* [sizeCPU2];
+
+	string hexAddr="";
+
 	for(int i=0; i< sizeCPU1; i++){
-		instructionsCPU1[i][0] =	CPU1_L1.hexToBin(instructionsCPU1[i][0]);
-//		cout <<"Direccion String Binario: "<< instructionsCPU1[i][0] << " Lectura/Escritura: "<< instructionsCPU1 [i][1] <<endl; 
+		hexAddr =	CPU1_L1.hexToBin(instructionsCPU1[i][0]);
+		AddressCPU1[i] = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);
+		cout<<"CPU1   Tag: "<< AddressCPU1[i][0] <<" Index: "<< AddressCPU1[i][1] <<" Offset: "<< AddressCPU1[i][2]<<endl;
 	}
-	
+
+	hexAddr="";
+
 	for(int i=0; i< sizeCPU2; i++){
-		instructionsCPU2[i][0] =	CPU2_L1.hexToBin(instructionsCPU2[i][0]);
-//		cout <<"Direccion String Binario: "<< instructionsCPU2[i][0] << " Lectura/Escritura: "<< instructionsCPU2 [i][1] <<endl;
+		hexAddr =	CPU2_L1.hexToBin(instructionsCPU2[i][0]);
+		AddressCPU2[i] = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);
+//		cout<<"CPU2   Tag: "<< AddressCPU2[i][0] <<" Index: "<< AddressCPU2[i][1] <<" Offset: "<< AddressCPU2[i][2]<<endl;
 	}
 
-	int miss_hit_leido =CPU1_L1.read(instructionsCPU2[1][0], L2);
 
-	switch (miss_hit_leido){
-		case '0': contadorMiss_L1 +=1; contadorMiss_L2 +=1;
-		case '1': contadorHit_L1 +=1;
-		case '2': contadorHit_L2 +=1; contadorMiss_L1 +=1;
-		default : contadorMiss_L1 +=1; contadorMiss_L2 +=1;
+
+	char miss_hit_leido =CPU1_L1.read(AddressCPU2[0][1], AddressCPU2[0][0]);
+	if(miss_hit_leido == 'h'){
+		contadorHit +=1;
 	}
+	else contadorMiss +=1;
 
-	cout<<"Misses L1="<< contadorMiss_L1 <<", Hits L1="<< contadorHit_L1 <<", Misses L2="<< contadorMiss_L1 <<", Hits L2="<< contadorHit_L1 <<endl;  
+		cout<<"Misses "<< contadorMiss <<" Hits "<< contadorHit <<endl;
 
 //Maquina de estados mesi
 //Determinar el estado Mesi
