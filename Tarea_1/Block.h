@@ -18,7 +18,7 @@
 using namespace std;
 
 #define WORD_SIZE 32   // Bits
-#define BLOCK_SIZE 32  // Bytes
+#define BLOCK_SIZE 256  // Bits
 
 #ifndef BLOCK_H
 #define BLOCK_H
@@ -28,6 +28,7 @@ class Block{
 public:
 	bool valid;
 	bool dirty;
+	int estado;
 	int tag;
 	int *data; // The block is 32B, then contains 8 words of 32b (int type size).
 

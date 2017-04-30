@@ -4,12 +4,14 @@
 //                          Tarea 1: Simulador de Cache
 //                                  I Ciclo 2017
 //
-//                                    mesi.h
+//                                    Mesi.h
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
-//          Guido Armas B30xxx
+//          Guido Armas B30647
 //*********************************************************************************
+
+#include "Mesi.h"
 
 class Mesi{
 
@@ -19,6 +21,6 @@ public:
 	bool	ubicacion;
 	char	evento;
 
-	Mesi();
+	Mesi(int estado, char evento, int * vdArray);
 	~Mesi();
 }

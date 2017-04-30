@@ -4,7 +4,7 @@
 //                          Tarea 1: Simulador de Cache
 //                                  I Ciclo 2017
 //
-//                                  mesi.cpp
+//                                  Mesi.cpp
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
@@ -19,16 +19,16 @@ using namespace std;
 Mesi::Mesi(int estado, char evento, int * vdArray){
 
 //Inicializar estado en invalido
-	estado = 0;
+	this->estado = 0;
 
 //Definicion de variables
-	copies = false;
-	ubicacion = false;
+	this->copies = false;
+	this->ubicacion = false;
 
 //La variable evento esta compuesta de la manera n-OP
 //n: indica de cual CPU viene la instruccion
 //O: indica la operacion solicitada, L o S
-	evento = '0';
+	this->evento = '0';
   vdArray[0] = 0;
   vdArray[1] = 0;
 }
@@ -199,7 +199,7 @@ int* estadoMESI (char evento) {
 		}
 	}
 
-  //trslacion de estados mesi a bits de valid y dirty
+  //traduccion de estados mesi a bits de valid y dirty
  switch (estado) {
    case 0:
       vdArray[0] = 0;

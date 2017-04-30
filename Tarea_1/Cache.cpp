@@ -16,7 +16,8 @@
 Cache::Cache(int bytes, int associativity){
 
 	LinesNumber = bytes/ (BLOCK_SIZE * associativity); 
-
+	this->associativity = associativity;	
+	
 	set = new Block* [LinesNumber]; 
 	
 	for (int i=0; i<LinesNumber; i++){
@@ -28,17 +29,17 @@ Cache::Cache(int bytes, int associativity){
 	}
 }
 	
-	
 //Destructor
 Cache::~Cache(){
+
 	for (int i=0; i < LinesNumber; i++){
 		delete[] set [i];
 	}
 	delete[] set;
 }
 
+int Cache::getFileLines(string &file){
 
-int Cache::getFileLines(string file){
 	ifstream data(file);
 	char c;
 	int count = 0;
@@ -51,11 +52,11 @@ int Cache::getFileLines(string file){
 	return count;
 }
 
-string** Cache::getFileData(string file, int size){
+string** Cache::getFileData(string &file, int &size){
 
 	string** dataArray;
-		
 	dataArray = new string* [size];
+
 	for (int i=0; i<size; i++){
 		dataArray[i] = new string [2];
 	}
@@ -90,7 +91,8 @@ string** Cache::getFileData(string file, int size){
 return dataArray;
 }
 
-string Cache::hexToBin(string sHex){
+string Cache::hexToBin(string &sHex){
+
 	string sReturn = "";
 	
 	while (sHex.length() < 6){
@@ -123,7 +125,7 @@ string Cache::hexToBin(string sHex){
 return sReturn;
 }
 
-int* Cache::binToInt(int tag_size, int index_size, int offset_size, string strBin){
+int* Cache::binToInt(int tag_size, int index_size, int offset_size, string &strBin){
 
 	int* addrInt;
 	addrInt = new int [3];
@@ -143,4 +145,43 @@ int* Cache::binToInt(int tag_size, int index_size, int offset_size, string strBi
 	
 return addrInt;
 }
+
+/*
+void Cache::write(int &index, int &tag, int &dato){
+
+	int [(BLOCK_SIZE/WORD_SIZE)] datablock;
+
+	for (int i=0; i< this->associativity; i++){
+		if(this->set[i][index].valid == true)
+	
+		if(tag == this->set[i][index].tag){
+			for(int j=0; j<(BLOCK_SIZE/WORD_SIZE); j++){
+				dataBlock[j] = this->set[i][index].data[j];
+			}
+			break;
+		}
+	}
+
+
+if(this->set[i][index].tag ==1)
+
+
+}
+*/
+
+char Cache::read(int &index, int &tag){
+	
+	char hit_miss='m';
+
+	for (int i=0; i< this->associativity; i++){
+		if((tag == this->set[i][index].tag) && (this->set[i][index].valid == true) && (this->set[i][index].dirty == false)){
+			hit_miss = 'h';	
+			break;
+		} 
+	}
+	return hit_miss;
+}
+
+
+
 

@@ -11,7 +11,8 @@
 #          Guido Armas B30647
 #*********************************************************************************
 
-OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h	
+OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h
+#OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h Mesi.h Mesi.cpp
 
 CC_1= g++ -std=c++0x
 

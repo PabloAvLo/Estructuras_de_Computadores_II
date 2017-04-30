@@ -14,9 +14,10 @@
 #include "Block.h"
  
 Block::Block(){
-	valid = 0;
+	valid = false;
+	dirty = false;
 	tag = 0;
-	dirty = 0;
+	estado = 0;
 
 	int words = BLOCK_SIZE/WORD_SIZE;
 

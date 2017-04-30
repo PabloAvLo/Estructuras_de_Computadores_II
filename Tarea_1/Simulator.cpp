@@ -12,6 +12,7 @@
 //*********************************************************************************
 
 #include "Cache.h"
+//#include "Mesi.h"
 
 #define CACHE_L1_SIZE 16384 //16kB = 2^14 Bytes
 #define TAG_SIZE_L1 11 // Bits
@@ -30,6 +31,11 @@ Cache CPU2_L1(CACHE_L1_SIZE, 2);
 Cache L2(CACHE_L2_SIZE, 1);
 
 int main(int argc, char* argv[]){
+
+	int contadorHit, contadorMiss;
+	contadorHit = 0;
+	contadorMiss = 0;
+
 //	cout<<"Numero de lineas del cache L1: "<< CPU1_L1.LinesNumber <<endl;	
 //	cout<<"Numero de lineas del cache L2: "<< L2.LinesNumber <<endl;
 	
@@ -61,15 +67,26 @@ int main(int argc, char* argv[]){
 	for(int i=0; i< sizeCPU1; i++){
 		hexAddr =	CPU1_L1.hexToBin(instructionsCPU1[i][0]);
 		AddressCPU1[i] = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);	
-//		cout<<"CPU1   Tag: "<< AddressCPU1[i][0] <<" Index: "<< AddressCPU1[i][1] <<" Offset: "<< AddressCPU1[i][2]<<endl;  
+		cout<<"CPU1   Tag: "<< AddressCPU1[i][0] <<" Index: "<< AddressCPU1[i][1] <<" Offset: "<< AddressCPU1[i][2]<<endl;  
 	}
 	
 	hexAddr="";
 
 	for(int i=0; i< sizeCPU2; i++){
-		hexAddr =	CPU2_L1.hexToBin(instructionsCPU1[i][0]);
+		hexAddr =	CPU2_L1.hexToBin(instructionsCPU2[i][0]);
 		AddressCPU2[i] = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, hexAddr);	
 //		cout<<"CPU2   Tag: "<< AddressCPU2[i][0] <<" Index: "<< AddressCPU2[i][1] <<" Offset: "<< AddressCPU2[i][2]<<endl;  
-	}				
+	}
+	
+
+
+	char miss_hit_leido =CPU1_L1.read(AddressCPU2[0][1], AddressCPU2[0][0]);
+	if(miss_hit_leido == 'h'){
+		contadorHit +=1;
+	}
+	else contadorMiss +=1;
+
+		cout<<"Misses "<< contadorMiss <<" Hits "<< contadorHit <<endl;  
+					
 } 
 
