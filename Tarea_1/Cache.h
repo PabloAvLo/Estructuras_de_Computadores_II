@@ -61,13 +61,5 @@ public:
 // @Parametro offset_size: Tamano destinado al offset de la direccion en cache.
 	int* binToInt(int tag_size, int index_size, int offset_size, string &strBin);
 
-// Esta funcion se encarga de leer los datos de un bloque del cache respectivo,
-// y retorna si ocurrio un miss o un hit en cada nivel de memoria.
-// @Parametro Dir: String de direccion en binario.
-// @Parametro nextLevel: Siguiente nivel de memoria para leer en caso de miss.
-	int read(string &dir, Cache &nextLevel);
-
-	int* mesiToValidDirty (int estado);
-
 };
 #endif
