@@ -15,11 +15,11 @@
 
 using namespace std;
 
+int main(int argc, char* argv[]){
+
 Cache CPU1_L1(CACHE_L1_SIZE, 2);
 Cache CPU2_L1(CACHE_L1_SIZE, 2);
 Cache L2(CACHE_L2_SIZE, 1);
-
-int main(int argc, char* argv[]){
 
 	int contadorHit_L1_1, contadorMiss_L1_1, contadorHit_L2, contadorMiss_L2;
 	int contadorHit_L1_2, contadorMiss_L1_2;
@@ -68,8 +68,6 @@ int main(int argc, char* argv[]){
 //		cout <<"Direccion String Binario: "<< instructionsCPU2[i][0] << " Lectura/Escritura: "<< instructionsCPU2 [i][1] <<endl;
 	}
 
-	cout<<"Misses L1_1="<< contadorMiss_L1_1 <<", Hits L1_1="<< contadorHit_L1_1 <<", Misses L2="<< contadorMiss_L2 <<", Hits L2="<< contadorHit_L2 <<endl;
-	cout<<"Misses L1_2="<< contadorMiss_L1_2 <<", Hits L1_2="<< contadorHit_L1_2 <<endl;
 
 //Maquina de estados mesi
 //Determinar el estado Mesi
@@ -90,6 +88,10 @@ int main(int argc, char* argv[]){
 	addrIntCPU2 = new int [3];
 	int* addrIntL2;
 	addrIntL2 = new int [3];
+	int m, n;
+	m=0;
+	n=0;
+
 
 //CPU1 ejecuta 3 instrucciones, luego CPU2 ejecuta 1, y se repite el patron
 	for (int h=0; h < 4; h++){
@@ -97,32 +99,30 @@ int main(int argc, char* argv[]){
 		if (h == 3) {
 			//cout << "CPU2" << endl;
 			h = 0;
-			for (int m=0; m<sizeCPU2; m++){
+		while(m<sizeCPU2){
 				//casos READ de CPU2
 				if (instructionsCPU2[m][1].compare(readS) == 0){
 					if (estadoL1_2 == 0){ //invalid
 						contadorMiss_L1_2 +=1;
-						//if (estadoL1_1 == 0){
 							//Revisar si el bloque esta en otro cache como Modified
 							if (estadoL1_1 == 2){
 								//actualizar dato del otro cache escribiendo
-								//addrIntCPU1 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
 								addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
 								addrIntL2 = L2.binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, instructionsCPU2[m][0]);
 
-								if((addrIntL2[0] == L2.set[m][addrIntL2[1]].tag) && (L2.set[m][addrIntL2[1]].valid == true) && (L2.set[m][addrIntL2[1]].dirty == false)){
+								if((addrIntL2[0] == L2.set[0][addrIntL2[1]].tag) && (L2.set[0][addrIntL2[1]].valid == true) && (L2.set[0][addrIntL2[1]].dirty == false)){
 									contadorHit_L2 += 1;
 								}
 								else contadorMiss_L2 += 1;
 
 								for (int p = 0; p < 8; p++){
-									CPU2_L1.set[0][addrIntCPU2[2]].data[p] = L2.set[0][addrIntL2[2]].data[p];
-									CPU1_L1.set[0][addrIntL2[2]].data[p] = L2.set[0][addrIntL2[2]].data[p];
+									CPU2_L1.set[0][addrIntCPU2[1]].data[p] = L2.set[0][addrIntL2[1]].data[p];
+									CPU1_L1.set[0][addrIntCPU2[1]].data[p] = L2.set[0][addrIntL2[1]].data[p];
 								}
 								CPU2_L1.set[0][addrIntCPU2[1]].tag = L2.set[0][addrIntL2[1]].tag;
-								CPU1_L1.set[0][addrIntL2[1]].tag = L2.set[0][addrIntL2[1]].tag;
+								CPU1_L1.set[0][addrIntCPU2[1]].tag = L2.set[0][addrIntL2[1]].tag;
 								CPU2_L1.set[0][addrIntCPU2[1]].estado = 3;
-								CPU1_L1.set[0][addrIntL2[1]].estado = 3;
+								CPU1_L1.set[0][addrIntCPU2[1]].estado = 3;
 								estadoL1_1 = 3;
 							}
 
@@ -131,7 +131,7 @@ int main(int argc, char* argv[]){
 								addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
 								for (int p = 0; p < 8; p++){
 									//Paso los datos de CPU2 a CPU1
-									CPU2_L1.set[0][addrIntCPU1[2]].data[p] = CPU1_L1.set[0][addrIntCPU1[2]].data[p];
+									CPU2_L1.set[0][addrIntCPU1[1]].data[p] = CPU1_L1.set[0][addrIntCPU1[1]].data[p];
 								}
 								CPU2_L1.set[0][addrIntCPU2[1]].tag = CPU1_L1.set[0][addrIntCPU1[1]].tag;
 								CPU2_L1.set[0][addrIntCPU2[1]].estado = 3;
@@ -141,13 +141,13 @@ int main(int argc, char* argv[]){
 								addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
 								addrIntL2 = L2.binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, instructionsCPU2[m][0]);
 
-								if((addrIntL2[0] == L2.set[m][addrIntL2[1]].tag) && (L2.set[m][addrIntL2[1]].valid == true) && (L2.set[m][addrIntL2[1]].dirty == false)){
+								if((addrIntL2[0] == L2.set[0][addrIntL2[1]].tag) && (L2.set[0][addrIntL2[1]].valid == true) && (L2.set[0][addrIntL2[1]].dirty == false)){
 									contadorHit_L2 += 1;
 								}
 								else contadorMiss_L2 += 1;
 
 								for (int p = 0; p < 8; p++){
-									CPU2_L1.set[0][addrIntL2[2]].data[p] = L2.set[0][addrIntL2[2]].data[p];
+									CPU2_L1.set[0][addrIntCPU2[1]].data[p] = L2.set[0][addrIntL2[2]].data[p];
 								}
 								CPU2_L1.set[0][addrIntCPU2[1]].tag = L2.set[0][addrIntL2[1]].tag;
 								CPU2_L1.set[0][addrIntCPU2[1]].estado = 1;
@@ -158,7 +158,7 @@ int main(int argc, char* argv[]){
 								addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
 								addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
 								for (int p = 0; p < 8; p++){
-									CPU2_L1.set[0][addrIntCPU2[2]].data[p] = CPU1_L1.set[0][addrIntCPU1[2]].data[p];
+									CPU2_L1.set[0][addrIntCPU2[1]].data[p] = CPU1_L1.set[0][addrIntCPU1[1]].data[p];
 								}
 								CPU2_L1.set[0][addrIntCPU2[1]].tag = CPU1_L1.set[0][addrIntCPU1[1]].tag;
 								CPU2_L1.set[0][addrIntCPU2[1]].estado = 3;
@@ -204,86 +204,115 @@ int main(int argc, char* argv[]){
 				}
 
 				//casos WRITE de CPU2
-				if (instructionsCPU2[m][1].compare(writeS) == 0){
+				else if (instructionsCPU2[m][1].compare(writeS) == 0){
 						//nuevos estados, iguales independientes de los casos
 						estadoL1_1 = 0;
 						estadoL1_2 = 2;
 						//obtengo tag, index y offset
 						addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
-						for (int p = 0; p < 8; p++){
-							CPU2_L1.set[0][addrIntCPU2[1]].data[p] = addrIntCPU2[2];
+						
+						// Politica LRU
+						
+						if(CPU2_L1.set[0][addrIntCPU2[1]].LRU ==false && CPU2_L1.set[1][addrIntCPU2[1]].LRU== false){
+							for (int p = 0; p < 8; p++){
+								CPU2_L1.set[0][addrIntCPU2[1]].data[p] = addrIntCPU2[2];
+							}
+							CPU2_L1.set[0][addrIntCPU2[1]].tag = addrIntCPU2[0];
+							CPU2_L1.set[0][addrIntCPU2[1]].estado = estadoL1_2;
+							CPU2_L1.set[0][addrIntCPU2[1]].LRU =true;
 						}
-						CPU2_L1.set[0][addrIntCPU2[1]].tag = addrIntCPU2[0];
-						CPU2_L1.set[0][addrIntCPU2[1]].estado = estadoL1_2;
+						
+						else if(CPU2_L1.set[0][addrIntCPU2[1]].LRU == true && CPU2_L1.set[1][addrIntCPU2[1]].LRU== false){
+							for (int p = 0; p < 8; p++){
+								CPU2_L1.set[1][addrIntCPU2[1]].data[p] = addrIntCPU2[2];
+							}
+							CPU2_L1.set[1][addrIntCPU2[1]].tag = addrIntCPU2[0];
+							CPU2_L1.set[1][addrIntCPU2[1]].estado = estadoL1_2;
+							CPU2_L1.set[1][addrIntCPU2[1]].LRU =true;
+							CPU2_L1.set[0][addrIntCPU2[1]].LRU =false;
+						}
+						else if(CPU2_L1.set[0][addrIntCPU2[1]].LRU == false && CPU2_L1.set[1][addrIntCPU2[1]].LRU== true){
+							for (int p = 0; p < 8; p++){
+								CPU2_L1.set[1][addrIntCPU2[1]].data[p] = addrIntCPU2[2];
+							}
+							CPU2_L1.set[0][addrIntCPU2[1]].tag = addrIntCPU2[0];
+							CPU2_L1.set[0][addrIntCPU2[1]].estado = estadoL1_2;
+							CPU2_L1.set[0][addrIntCPU2[1]].LRU =true;
+							CPU2_L1.set[1][addrIntCPU2[1]].LRU =false;
+						}
+						
 				}
+				
+			m++;
+			cout<<"m: "<<m<< endl;
+			break;	
 			}
-		}
+		} 
 //-----------------------------------------CPU1
 		else {
-			for (int i=0; i < sizeCPU1; i++){
+				while(n< sizeCPU1){
 				//cout << "ESTADO L1_1: " << estadoL1_1 << endl;
 				//cout << "ESTADO L1_2: " << estadoL1_2 << endl;
 				//casos READ de CPU1
-				if (instructionsCPU1[i][1].compare(readS) == 0){
+				if (instructionsCPU1[n][1].compare(readS) == 0){
 
 					if (estadoL1_1 == 0){
 						contadorMiss_L1_1 +=1;
 						//Revisar si el bloque esta en otro cache como Modified
 						if (estadoL1_2 == 2){
 							//actualizar dato del otro cache escribiendo
-							//addrIntCPU1 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU2[m][0]);
-							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
-							addrIntL2 = L2.binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, instructionsCPU1[i][0]);
+							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
+							addrIntL2 = L2.binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, instructionsCPU1[n][0]);
 
-							if((addrIntL2[0] == L2.set[i][addrIntL2[1]].tag) && (L2.set[i][addrIntL2[1]].valid == true) && (L2.set[i][addrIntL2[1]].dirty == false)){
+							if((addrIntL2[0] == L2.set[0][addrIntL2[1]].tag) && (L2.set[0][addrIntL2[1]].valid == true) && (L2.set[0][addrIntL2[1]].dirty == false)){
 								contadorHit_L2 += 1;
 							}
 							else contadorMiss_L2 += 1;
 
 							for (int p = 0; p < 8; p++){
-								CPU1_L1.set[0][addrIntCPU1[2]].data[p] = L2.set[0][addrIntL2[2]].data[p];
-								CPU2_L1.set[0][addrIntL2[2]].data[p] = L2.set[0][addrIntL2[2]].data[p];
+								CPU1_L1.set[0][addrIntCPU1[1]].data[p] = L2.set[0][addrIntL2[1]].data[p];
+								CPU2_L1.set[0][addrIntCPU1[1]].data[p] = L2.set[0][addrIntL2[1]].data[p];
 							}
-							CPU1_L1.set[0][addrIntCPU1[1]].tag = L2.set[0][addrIntL2[1]].tag;
-							CPU2_L1.set[0][addrIntL2[1]].tag = L2.set[0][addrIntL2[1]].tag;
+							CPU1_L1.set[0][addrIntCPU1[1]].tag = addrIntCPU1[0];
+							CPU2_L1.set[0][addrIntCPU1[1]].tag = addrIntCPU1[0];
 							CPU1_L1.set[0][addrIntCPU1[1]].estado = 3;
-							CPU2_L1.set[0][addrIntL2[1]].estado = 3;
+							CPU2_L1.set[0][addrIntCPU1[1]].estado = 3;
 							estadoL1_2 = 3;
 						}
 
 						if (estadoL1_2 == 1){
-							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
-							addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
+							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
+							addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
 							for (int p = 0; p < 8; p++){
 								//Paso los datos de CPU2 a CPU1
-								CPU1_L1.set[0][addrIntCPU1[1]].data[p] = CPU2_L1.set[0][addrIntCPU2[2]].data[p];
+								CPU1_L1.set[0][addrIntCPU1[1]].data[p] = CPU2_L1.set[0][addrIntCPU2[1]].data[p];
 							}
 							CPU1_L1.set[0][addrIntCPU1[1]].tag = CPU2_L1.set[0][addrIntCPU2[1]].tag;
 							CPU1_L1.set[0][addrIntCPU1[1]].estado = 3;
 						}
 
 						if (estadoL1_2 == 0){
-							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
-							addrIntL2 = L2.binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, instructionsCPU1[i][0]);
+							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
+							addrIntL2 = L2.binToInt(TAG_SIZE_L2, INDEX_SIZE_L2, OFFSET_SIZE_L2, instructionsCPU1[n][0]);
 
-							if((addrIntL2[0] == L2.set[i][addrIntL2[1]].tag) && (L2.set[i][addrIntL2[1]].valid == true) && (L2.set[i][addrIntL2[1]].dirty == false)){
+							if((addrIntL2[0] == L2.set[0][addrIntL2[1]].tag) && (L2.set[0][addrIntL2[1]].valid == true) && (L2.set[0][addrIntL2[1]].dirty == false)){
 								contadorHit_L2 += 1;
 							}
 							else contadorMiss_L2 += 1;
 
 							for (int p = 0; p < 8; p++){
-								CPU1_L1.set[0][addrIntCPU1[2]].data[p] = L2.set[0][addrIntL2[2]].data[p];
+								CPU1_L1.set[0][addrIntCPU1[1]].data[p] = L2.set[0][addrIntL2[1]].data[p];
 							}
-							CPU1_L1.set[0][addrIntCPU1[1]].tag = L2.set[0][addrIntL2[1]].tag;
+							CPU1_L1.set[0][addrIntCPU1[1]].tag = addrIntCPU1[0];
 							CPU1_L1.set[0][addrIntCPU1[1]].estado = 1;
 							estadoL1_2 = 1;
 						}
 
 						if (estadoL1_2 == 3){
-							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
-							addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
+							addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
+							addrIntCPU2 = CPU2_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
 							for (int p = 0; p < 8; p++){
-								CPU1_L1.set[0][addrIntCPU1[2]].data[p] = CPU2_L1.set[0][addrIntCPU2[2]].data[p];
+								CPU1_L1.set[0][addrIntCPU1[1]].data[p] = CPU2_L1.set[0][addrIntCPU2[1]].data[p];
 							}
 							CPU1_L1.set[0][addrIntCPU1[1]].tag = CPU2_L1.set[0][addrIntCPU2[1]].tag;
 							CPU1_L1.set[0][addrIntCPU1[1]].estado = 3;
@@ -327,18 +356,48 @@ int main(int argc, char* argv[]){
 				}
 
 				//casos WRITE de CPU1
-				if (instructionsCPU1[i][1].compare(writeS) == 0){
+				if (instructionsCPU1[n][1].compare(writeS) == 0){
 					//nuevos estados, iguales independientes de los casos
 					estadoL1_2 = 0;
 					estadoL1_1 = 2;
 					//obtengo tag, index y offset
-					addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[i][0]);
-					for (int p = 0; p < 8; p++){
-						CPU1_L1.set[0][addrIntCPU1[1]].data[p] = addrIntCPU1[2];
-					}
-					CPU1_L1.set[0][addrIntCPU1[1]].tag = addrIntCPU1[0];
-					CPU1_L1.set[0][addrIntCPU1[1]].estado = estadoL1_1;
+					addrIntCPU1 = CPU1_L1.binToInt(TAG_SIZE_L1, INDEX_SIZE_L1, OFFSET_SIZE_L1, instructionsCPU1[n][0]);
+					cout<< sizeCPU1 << " "<< n<<endl; 
+
+											// Politica LRU
+						
+						if(CPU1_L1.set[0][addrIntCPU1[1]].LRU ==false && CPU1_L1.set[1][addrIntCPU1[1]].LRU== false){
+							for (int p = 0; p < 8; p++){
+								CPU1_L1.set[0][addrIntCPU1[1]].data[p] = addrIntCPU1[2];
+							}
+							CPU1_L1.set[0][addrIntCPU2[1]].tag = addrIntCPU1[0];
+							CPU1_L1.set[0][addrIntCPU2[1]].estado = estadoL1_1;
+							CPU1_L1.set[0][addrIntCPU2[1]].LRU =true;
+						}
+						
+						else if(CPU1_L1.set[0][addrIntCPU1[1]].LRU == true && CPU1_L1.set[1][addrIntCPU1[1]].LRU== false){
+							for (int p = 0; p < 8; p++){
+								CPU1_L1.set[1][addrIntCPU1[1]].data[p] = addrIntCPU1[2];
+							}
+							CPU1_L1.set[1][addrIntCPU2[1]].tag = addrIntCPU1[0];
+							CPU1_L1.set[1][addrIntCPU2[1]].estado = estadoL1_1;
+							CPU1_L1.set[1][addrIntCPU2[1]].LRU =true;
+							CPU1_L1.set[0][addrIntCPU2[1]].LRU =false;
+						}
+						else if(CPU1_L1.set[0][addrIntCPU1[1]].LRU == false && CPU1_L1.set[1][addrIntCPU1[1]].LRU== true){
+							for (int p = 0; p < 8; p++){
+								CPU1_L1.set[1][addrIntCPU1[1]].data[p] = addrIntCPU1[2];
+							}
+							CPU1_L1.set[0][addrIntCPU1[1]].tag = addrIntCPU1[0];
+							CPU1_L1.set[0][addrIntCPU1[1]].estado = estadoL1_1;
+							CPU1_L1.set[0][addrIntCPU1[1]].LRU =true;
+							CPU1_L1.set[1][addrIntCPU1[1]].LRU =false;
+						}
+		
 				}
+				n++;
+				cout<<"n: "<<n<< endl;
+				break;
 			}
 		}
 
@@ -357,5 +416,20 @@ int main(int argc, char* argv[]){
 		else {
 			copies_L2 = 1;
 		}
-	}
+	
+		cout<<"h: "<<h<< endl;
+		if( (m >= sizeCPU2) || (n >= sizeCPU2) ) break;
+	} 
+	
+	
+	cout<<"Misses L1_1="<< contadorMiss_L1_1 <<", Hits L1_1="<< contadorHit_L1_1 <<", Misses L2="<< contadorMiss_L2 <<", Hits L2="<< contadorHit_L2 <<endl;
+	cout<<"Misses L1_2="<< contadorMiss_L1_2 <<", Hits L1_2="<< contadorHit_L1_2 <<endl;
+	
+	int missrateL1_1=  (contadorMiss_L1_1*100)/(contadorMiss_L1_1 +contadorHit_L1_1);
+	int missrateL1_2=  (contadorMiss_L1_2*100)/(contadorMiss_L1_2 +contadorHit_L1_2);
+	int missrateL2=  (contadorMiss_L2*100)/(contadorMiss_L2 +contadorHit_L2);
+	
+	cout<< "Miss Rate Cache L1 CPU1 ="<< missrateL1_1 << endl;
+	cout<< "Miss Rate Cache L1 CPU2	="<< missrateL1_2 << endl;
+	cout<< "Miss Rate Cache L2 ="<< missrateL2 << endl;
 }

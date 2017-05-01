@@ -12,16 +12,16 @@
 #*********************************************************************************
 
 OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h
-#OBJS_1= Simulator.cpp Block.cpp Block.h Cache.cpp Cache.h Mesi.h Mesi.cpp
 
-CC_1= g++ -std=c++0x
+CC_1= g++ -std=c++0x 
+FLAGS_1 = -Wall --pedantic
 
 TARGET_1 = Simulador
 
 all: $(TARGET_1) 
 
 $(TARGET_1): $(OBJS_1)
-	$(CC_1) -o $(TARGET_1) $(OBJS_1)
+	$(CC_1) $(FLAGS_1) -o $(TARGET_1) $(OBJS_1)
 	
 run:	
 	./$(TARGET_1)

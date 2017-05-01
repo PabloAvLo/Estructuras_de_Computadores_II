@@ -61,16 +61,6 @@ public:
 // @Parametro offset_size: Tamano destinado al offset de la direccion en cache.
 	int* binToInt(int tag_size, int index_size, int offset_size, string &strBin);
 
-// La funcion write escribe en la linea [index] del cache L1 respectivo, un dato,
-// (en este caso se usara el offset de la direccion como dato ya que el archivo 
-// a leer solo contenia direcciones y la instruccion L/S). 
-// Si la posicion esta vacia, solo lo escribe ahi, pero si el bloque tiene ya un 
-// dato escrito, este se escribira en la cache L2 antes de escribir el dato nuevo 
-// en L1. 
-// @Parametro Index: Index de la direccion a escribir.
-// @Parametro Tag: Valor de etiqueta para comparar.
-//	void write(int &index, int &tag, int &dato);
-
 // Esta funcion se encarga de leer los datos de un bloque del cache respectivo,
 // y retorna si ocurrio un miss o un hit en cada nivel de memoria.
 // @Parametro Dir: String de direccion en binario.

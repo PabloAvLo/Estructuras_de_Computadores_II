@@ -24,7 +24,7 @@ Cache::Cache(int bytes, int associativity){
 		set[i] = new Block [associativity];
 
 		for (int j=0; j<associativity; j++){
-			set [i][j].data[2] = 590;
+			set [i][j].data[2] = 0;
 		}
 	}
 }
@@ -74,7 +74,7 @@ string** Cache::getFileData(string &file, int &size){
   		getline(data,line); // Saves the line in STRING.
 			hexa = "";
 			if (line.length() > 1){
-				for(int i=2; i< ( line.length() -3); i++) {
+				for(int i=2; i< ((signed) line.length() -3); i++) {
 					hexa = hexa + line.at(i);
 			  }
 
@@ -99,7 +99,7 @@ string Cache::hexToBin(string &sHex){
 			sHex = "0" + sHex;
 	}
 
-	for (int i = 0; i < sHex.length (); ++i)
+	for (int i = 0; i < (signed)sHex.length (); ++i)
 	{
 		switch (sHex [i])
 		{
@@ -180,29 +180,6 @@ int * Cache::mesiToValidDirty (int estado){
 //del miss y hit rate
 	return vdArray;
 }
-
-/*
-void Cache::write(int &index, int &tag, int &dato){
-
-	int [(BLOCK_SIZE/WORD_SIZE)] datablock;
-
-	for (int i=0; i< this->associativity; i++){
-		if(this->set[i][index].valid == true)
-
-		if(tag == this->set[i][index].tag){
-			for(int j=0; j<(BLOCK_SIZE/WORD_SIZE); j++){
-				dataBlock[j] = this->set[i][index].data[j];
-			}
-			break;
-		}
-	}
-
-
-if(this->set[i][index].tag ==1)
-
-
-}
-*/
 
 int Cache::read(string &dir, Cache &nextLevel){
 	

@@ -16,10 +16,11 @@
 Block::Block(){
 	valid = false;
 	dirty = false;
+	LRU = false;
 	tag = 0;
 	estado = 0;
 
-	int words = BLOCK_SIZE/WORD_SIZE;
+	int words = (BLOCK_SIZE*8)/WORD_SIZE;
 
 	data = new int [words];
 	
