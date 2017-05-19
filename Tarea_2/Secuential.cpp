@@ -14,6 +14,7 @@
 //*********************************************************************************
 
 #include "Functions.h"
+#include <string>
 using namespace std;
 
 int main(int argc, char* argv[]){
@@ -21,13 +22,22 @@ int main(int argc, char* argv[]){
 Functions Func;
 
 	string fileData = "dataProximaCentauri.csv";
-	float** spectrumPCentauri;
-
 	int sizeFile = Func.getFileLines(fileData);
+
+	float** spectrumPCentauri;
+	string* PCentauriElements;
+	PCentauriElements = new string [sizeFile];
+
 	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
+	PCentauriElements = Func.getElement(spectrumPCentauri, sizeFile);
 
 	for(int i=0; i<sizeFile; i++){
 		// WL [nm], Flux [W/m2/nm]
-		cout <<"Wave Length [nm]: "<< spectrumPCentauri[i][0] << " Irradiance [W/m2/nm]: "<< spectrumPCentauri[i][1] <<endl;
+		cout << "\nWave Length [nm]: " << spectrumPCentauri[i][0] << " Irradiance [W/m2/nm]: " << spectrumPCentauri[i][1] <<endl;
+		cout << "Element: ";
+		for (int j = 0; j < 15; j++){
+			cout << PCentauriElements[i][j];
+		}
+		cout << endl;
 	}
 }

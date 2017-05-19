@@ -12,6 +12,7 @@
 //*********************************************************************************
 
 #include "Functions.h"
+using namespace std;
 
 //Constructor
 Functions::Functions(){}
@@ -76,5 +77,28 @@ float** Functions::getFileData(string &file, int &size){
 		data.close();
 	}
 
-return dataArray;
+	return dataArray;
+}
+
+string* Functions::getElement(float** dataArray, int &size){
+	string* element;
+	element = new string [size];
+
+	for (int i = 0; i < size; i++){
+		if ((dataArray[i][0] < Oxygen_WL + Oxygen_TL) 			&& (dataArray[i][0] > Oxygen_WL - Oxygen_TL))
+			element[i] = "Oxygen";
+		else if ((dataArray[i][0] < Hydro_a_WL + Hydro_a_TL) && (dataArray[i][0] > Hydro_a_WL - Hydro_a_TL))
+			element[i] = "Hydrogen alpha";
+		else if ((dataArray[i][0] < Sodium_WL + Sodium_TL) 	&& (dataArray[i][0] > Sodium_WL - Sodium_TL))
+			element[i] = "Neutral sodium";
+		else if ((dataArray[i][0] < Iron_WL + Iron_TL) 			&& (dataArray[i][0] > Iron_WL - Iron_TL))
+			element[i] = "Neutral iron";
+		else if ((dataArray[i][0] < Hydro_b_WL + Hydro_b_TL) && (dataArray[i][0] > Hydro_b_WL - Hydro_b_TL))
+			element[i] = "Hydrogen beta";
+		else if ((dataArray[i][0] < Calcium_WL + Calcium_TL) && (dataArray[i][0] > Calcium_WL - Calcium_TL))
+			element[i] = "Ionized calcium";
+		else
+			element[i] = "Unknown element";	//Elemento desconocido o WL no calza dentro de uno de los elementos conocidos
+	}
+	return element;
 }

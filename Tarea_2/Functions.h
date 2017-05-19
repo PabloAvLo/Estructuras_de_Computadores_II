@@ -17,7 +17,22 @@
 
 using namespace std;
 
-#define Helium_WL 587.5618 // [nm]
+//Obtenido de http://www.columbia.edu/~vjd1/Solar%20Spectrum%20Ex.html
+//Wavelength de los elementos conocidos
+#define Oxygen_WL 	723.05
+#define Hydro_a_WL 	656.30
+#define Sodium_WL 	589.33
+#define Iron_WL 		527.00
+#define Hydro_b_WL  486.10
+#define Calcium_WL 	393.40
+
+//Tolerancia de wavelength de los elementos conocidos
+#define Oxygen_TL 	51.55
+#define Hydro_a_TL 	33.35
+#define Sodium_TL 	31.30
+#define Iron_TL 		21.50
+#define Hydro_b_TL  19.40
+#define Calcium_TL 	36.65
 
 #ifndef FUNCTIONS_H
 #define FUNCTIONS_H
@@ -39,5 +54,10 @@ public:
 // @Parametro	size: Numero de lineas del archivo a leer.
 	float** getFileData(string &file, int &size);
 
+// La funcion getElements devuelve un arreglo de strings, compuesto por los
+// nombres de los elementos encontrados al procesar los datos de Wavelength
+// @Parametro dataArray: lista de wavelengths a procesar
+// @Parametro size: Numero de lineas del archivo a leer
+	string* getElement(float** dataArray, int &size);
 };
 #endif
