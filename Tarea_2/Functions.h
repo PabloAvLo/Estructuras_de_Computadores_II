@@ -58,6 +58,6 @@ public:
 // nombres de los elementos encontrados al procesar los datos de Wavelength
 // @Parametro dataArray: lista de wavelengths a procesar
 // @Parametro size: Numero de lineas del archivo a leer
-	string* getElement(float** dataArray, int &size);
+//	string* getElement(float** dataArray, int &size);
 };
 #endif

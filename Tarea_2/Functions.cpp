@@ -79,7 +79,7 @@ float** Functions::getFileData(string &file, int &size){
 
 	return dataArray;
 }
-
+/*
 string* Functions::getElement(float** dataArray, int &size){
 	string* element;
 	element = new string [size];
@@ -101,4 +101,4 @@ string* Functions::getElement(float** dataArray, int &size){
 			element[i] = "Unknown element";	//Elemento desconocido o WL no calza dentro de uno de los elementos conocidos
 	}
 	return element;
-}
+}*/
