@@ -4,7 +4,7 @@
 //               Tarea 2: Paralelizacion de Clustering Data Mining
 //                                  I Ciclo 2017
 //
-//                                 Secuential.cpp
+//                                 Parallel.cpp
 //
 // Prof: Francisco Rivera
 // Authors: Pablo Avila B30724
@@ -16,6 +16,7 @@
 #include "Functions.h"
 #include <string>
 #include <ctime>
+#include "mpi.h"
 
 using namespace std;
 
@@ -24,6 +25,22 @@ int main(int argc, char* argv[]){
 clock_t start;
 double duration;
 start = clock();
+
+  // Declaro variables para paralelizar
+int procs; 												 // Cantidad de procesos a utilizar
+int id; 	 												 // Identificador del proceso actaul
+int largo; 												 // Longitud del proceso actual
+int rc;														 // Grupo al que pertenecen los procesos
+char host[MPI_MAX_PROCESSOR_NAME]; // Nombre del proceso principal
+
+	// Inicializo el "Mundo" que contiene los procesos
+rc = MPI_Init(&argc, &argv);
+
+MPI_Status stat;
+
+MPI_Comm_size(MPI_COMM_WORLD, &procs);
+MPI_Comm_rank(MPI_COMM_WORLD, &id);
+MPI_Get_processor_name(host, &largo);
 
 Functions Func;
 int oxygen =0;
@@ -37,10 +54,19 @@ int unknown =0;
 	string fileData = "dataProximaCentauri.csv";
 	int sizeFile = Func.getFileLines(fileData);
 
+	int procLength = sizeFile/procs; // Cantidad de elementos para cada proceso.
+
 	// Matriz que contiene la longitud de onda e irrandianza de una medicion
 	// en cada fila, con un numero "sizeFile" de filas.
 	float** spectrumPCentauri;
 	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
+
+	// Creamos la sub matriz
+	float** procData;
+	procData = new float* [procLength];
+	for (int i=0; i<procLength; i++){
+		procData[i] = new float [2];
+	}
 
 	//getElement implementation
 	string* PCentauriElements;
@@ -77,18 +103,7 @@ int unknown =0;
 		}
 	}
 
-	//PCentauriElements = Func.getElement(spectrumPCentauri, sizeFile);
-
-	// for(int i=0; i<sizeFile; i++){
-	// 	// WL [nm], Flux [W/m2/nm]
-	// 	cout << "\nWave Length [nm]: " << spectrumPCentauri[i][0] << " Irradiance [W/m2/nm]: " << spectrumPCentauri[i][1] <<endl;
-	// 	cout << "Element: ";
-	// 	for (int j = 0; j < 15; j++){
-	// 		cout << PCentauriElements[i][j];
-	// 	}
-	// 	cout<<endl;
-	// }
-	cout <<endl<< "-----Serial Algorithm STATS-----" <<endl<<endl;
+	cout <<endl<< "----Parallel Algorithm STATS----" <<endl<<endl;
 	cout <<"     Oxygen:          "<< oxygen << endl;
 	cout <<"     Hydrogen Alpha:  "<< hydrogenAlpha << endl;
 	cout <<"     Neutral Sodium:  "<< sodium << endl;
@@ -98,7 +113,8 @@ int unknown =0;
 	cout <<"     Unknown Element: "<< unknown << endl;
 
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-	cout<<endl<<"     Serial Time:     "<< duration <<" [s]" <<endl<<endl;
+	cout<<endl<<"     Parallel Time:   "<< duration <<" [s]" <<endl<<endl;
 
+	MPI_Finalize();
 	return 0;
 }
