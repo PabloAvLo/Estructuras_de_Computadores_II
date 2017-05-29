@@ -100,9 +100,9 @@ int unknown =0;
 	cout <<"     Unknown Element: "<< unknown << endl;
 
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-	cout<<endl<<"     Serial Time:     "<< duration <<" [s]" <<endl<<endl;
+	cout<<endl<<"     Total Serial Time:     "<< duration <<" [s]" <<endl<<endl;
 	duration_Serial = ( std::clock() - start_Serial ) / (double) CLOCKS_PER_SEC;
-	cout<<endl<<"     Serial Time:     "<< duration_Serial <<" [s]" <<endl<<endl;
+	cout<<endl<<"     Partial Serialize Time:     "<< duration_Serial <<" [s]" <<endl<<endl;
 
 	return 0;
 }

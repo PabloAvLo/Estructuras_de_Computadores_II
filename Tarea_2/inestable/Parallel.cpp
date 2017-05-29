@@ -35,15 +35,6 @@ int main(int argc, char* argv[]){
 	int rc;														 // Grupo al que pertenecen los procesos
 	char host[MPI_MAX_PROCESSOR_NAME]; // Nombre del proceso principal
 
-	// Inicializo el "Mundo" que contiene los procesos
-	rc = MPI_Init(&argc, &argv);
-
-	MPI_Status stat;
-
-	MPI_Comm_size(MPI_COMM_WORLD, &procs);
-	MPI_Comm_rank(MPI_COMM_WORLD, &id);
-	MPI_Get_processor_name(host, &largo);
-
 	Functions Func;
 	int sizeFile;
 
@@ -56,12 +47,22 @@ int main(int argc, char* argv[]){
 	string PCentauriElements[sizeFile];
 	float procData[procLength+1];
 
-		// Arreglo que contiene la longitud de onda de una medicion
-		// en cada fila, con un numero "sizeFile" de filas.
-		float* spectrumPCentauri;
+	// Arreglo que contiene la longitud de onda de una medicion
+	// en cada fila, con un numero "sizeFile" de filas.
+	float* spectrumPCentauri;
 
-		//Se cuentan las lineas del archivo
-		spectrumPCentauri = Func.getFileData(fileData, sizeFile);
+	//Se cuentan las lineas del archivo
+	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
+
+	// Inicializo el "Mundo" que contiene los procesos
+	rc = MPI_Init(&argc, &argv);
+
+	MPI_Status stat;
+
+	MPI_Comm_size(MPI_COMM_WORLD, &procs);
+	MPI_Comm_rank(MPI_COMM_WORLD, &id);
+	MPI_Get_processor_name(host, &largo);
+
 	MPI_Scatter(spectrumPCentauri, procLength, MPI_FLOAT, &procData, procLength, MPI_FLOAT, 0, MPI_COMM_WORLD);
 
 	start_Parallel = clock();
@@ -144,9 +145,9 @@ int main(int argc, char* argv[]){
 		cout <<"     Unknown Element: "<< *unknownT << endl;
 
 		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-		cout<<endl<<"     Parallel Time:   "<< duration <<" [s]" <<endl<<endl;
+		cout<<endl<<"     Total Parallel Time:   "<< duration <<" [s]" <<endl<<endl;
 		duration_Parallel = ( std::clock() - start_Parallel ) / (double) CLOCKS_PER_SEC;
-		cout<<endl<<"     Parallel Time:   "<< duration_Parallel <<" [s]" <<endl<<endl;
+		cout<<endl<<"     Partial Parallel Time:   "<< duration_Parallel <<" [s]" <<endl<<endl;
 	}
 	return 0;
 }
