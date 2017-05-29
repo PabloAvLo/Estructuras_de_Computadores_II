@@ -23,10 +23,12 @@ using namespace std;
 int main(int argc, char* argv[]){
 
 	clock_t start;
+	clock_t start_Parallel;
 	double duration;
+	double duration_Parallel;
 	start = clock();
 
-	  // Declaro variables para paralelizar
+	// Declaro variables para paralelizar
 	int procs; 												 // Cantidad de procesos a utilizar
 	int id; 	 												 // Identificador del proceso actaul
 	int largo; 												 // Longitud del proceso actual
@@ -42,34 +44,27 @@ int main(int argc, char* argv[]){
 	MPI_Comm_rank(MPI_COMM_WORLD, &id);
 	MPI_Get_processor_name(host, &largo);
 
-	int sizeFile;
-	float** spectrumPCentauri;
-
 	Functions Func;
+	int sizeFile;
 
+	//Archivo a leer
 	string fileData = "dataProximaCentauri.csv";
 	sizeFile = Func.getFileLines(fileData);
-	float data[sizeFile];
-
-	//getElement implementation
-	string PCentauriElements[sizeFile];
-
-	// Matriz que contiene la longitud de onda e irrandianza de una medicion
-	// en cada fila, con un numero "sizeFile" de filas.
-	if(id==0){
-	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
-	for(int i=0; i< sizeFile; i++){
-		data[i] = spectrumPCentauri[i][0];
-	//	cout<< data[i] <<endl;
-	}
-}
-
-	// Creamos la sub matriz
 	int procLength = sizeFile/procs; // Cantidad de elementos para cada proceso.
+
+	// Se hace una arraglo clasificando cada medicion como un elemento quimico
+	string PCentauriElements[sizeFile];
 	float procData[procLength+1];
 
-	MPI_Scatter(&data, procLength, MPI_FLOAT, &procData, procLength, MPI_FLOAT, 0, MPI_COMM_WORLD);
+		// Arreglo que contiene la longitud de onda de una medicion
+		// en cada fila, con un numero "sizeFile" de filas.
+		float* spectrumPCentauri;
 
+		//Se cuentan las lineas del archivo
+		spectrumPCentauri = Func.getFileData(fileData, sizeFile);
+	MPI_Scatter(spectrumPCentauri, procLength, MPI_FLOAT, &procData, procLength, MPI_FLOAT, 0, MPI_COMM_WORLD);
+
+	start_Parallel = clock();
 	int oxygen =0;
 	int hydrogenAlpha =0;
 	int sodium =0;
@@ -78,11 +73,12 @@ int main(int argc, char* argv[]){
 	int calcium =0;
 	int unknown =0;
 
+	// La siguiente funcionalidad devuelve un arreglo de strings, compuesto por los
+	// nombres de los elementos encontrados al procesar los datos de Wavelength
 	for (int i = 0; i < procLength; i++){
 		if ((procData[i] < Oxygen_WL + Oxygen_TL) 			&& (procData[i] > Oxygen_WL - Oxygen_TL)){
 			PCentauriElements[i] = "Oxygen";
 			oxygen +=1;
-
 		}
 		else if ((procData[i] < Hydro_a_WL + Hydro_a_TL) && (procData[i] > Hydro_a_WL - Hydro_a_TL)){
 			PCentauriElements[i] = "Hydrogen alpha";
@@ -149,6 +145,8 @@ int main(int argc, char* argv[]){
 
 		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 		cout<<endl<<"     Parallel Time:   "<< duration <<" [s]" <<endl<<endl;
+		duration_Parallel = ( std::clock() - start_Parallel ) / (double) CLOCKS_PER_SEC;
+		cout<<endl<<"     Parallel Time:   "<< duration_Parallel <<" [s]" <<endl<<endl;
 	}
 	return 0;
 }

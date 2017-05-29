@@ -52,12 +52,6 @@ public:
 // longitud de onda, datos obtenidos con espectroscopia de absorsion.
 // @Parametro file: archivo del cual se extrae la informacion.
 // @Parametro	size: Numero de lineas del archivo a leer.
-	float** getFileData(string &file, int &size);
-
-// La funcion getElements devuelve un arreglo de strings, compuesto por los
-// nombres de los elementos encontrados al procesar los datos de Wavelength
-// @Parametro dataArray: lista de wavelengths a procesar
-// @Parametro size: Numero de lineas del archivo a leer
-//	string* getElement(float** dataArray, int &size);
+	float* getFileData(string &file, int &size);
 };
 #endif
