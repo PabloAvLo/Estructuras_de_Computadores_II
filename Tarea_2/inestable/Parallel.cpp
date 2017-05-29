@@ -56,10 +56,13 @@ int main(int argc, char* argv[]){
 
 	// Matriz que contiene la longitud de onda e irrandianza de una medicion
 	// en cada fila, con un numero "sizeFile" de filas.
+	if(id==0){
 	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
 	for(int i=0; i< sizeFile; i++){
 		data[i] = spectrumPCentauri[i][0];
+	//	cout<< data[i] <<endl;
 	}
+}
 
 	// Creamos la sub matriz
 	int procLength = sizeFile/procs; // Cantidad de elementos para cada proceso.
@@ -75,10 +78,11 @@ int main(int argc, char* argv[]){
 	int calcium =0;
 	int unknown =0;
 
-	for (int i = id*procLength; i < (id+1)*procLength; i++){
+	for (int i = 0; i < procLength; i++){
 		if ((procData[i] < Oxygen_WL + Oxygen_TL) 			&& (procData[i] > Oxygen_WL - Oxygen_TL)){
 			PCentauriElements[i] = "Oxygen";
 			oxygen +=1;
+
 		}
 		else if ((procData[i] < Hydro_a_WL + Hydro_a_TL) && (procData[i] > Hydro_a_WL - Hydro_a_TL)){
 			PCentauriElements[i] = "Hydrogen alpha";
