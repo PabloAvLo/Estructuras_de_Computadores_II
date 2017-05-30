@@ -23,8 +23,6 @@ int main(int argc, char* argv[]){
 
 clock_t start;
 double duration;
-clock_t start_Serial;
-double duration_Serial;
 start = clock();
 
 Functions Func;
@@ -43,7 +41,6 @@ spectrumPCentauri = Func.getFileData(fileData, sizeFile);
 // Se hace una arraglo clasificando cada medicion como un elemento quimico
 string PCentauriElements[sizeFile];
 
-start_Serial = clock();
 int oxygen =0;
 int hydrogenAlpha =0;
 int sodium =0;
@@ -101,8 +98,5 @@ int unknown =0;
 
 	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
 	cout<<endl<<"     Total Serial Time:     "<< duration <<" [s]" <<endl<<endl;
-	duration_Serial = ( std::clock() - start_Serial ) / (double) CLOCKS_PER_SEC;
-	cout<<endl<<"     Partial Serialize Time:     "<< duration_Serial <<" [s]" <<endl<<endl;
-
 	return 0;
 }

@@ -14,7 +14,7 @@
 OBJS_1= Secuential.cpp Functions.cpp Functions.h
 OBJS_2= Parallel.cpp Functions.cpp Functions.h
 
-CC_1=mpicxx -std=c++0x
+CC_1=g++ -std=c++0x
 
 TARGET_1 = Secuential
 TARGET_2 = Parallel
@@ -25,10 +25,10 @@ $(TARGET_1): $(OBJS_1)
 	$(CC_1) -o $(TARGET_1) $(OBJS_1)
 
 $(TARGET_2): $(OBJS_2)
-	$(CC_1) $(OBJS_2) -o $(TARGET_2)
+	$(CC_1) $(OBJS_2) -o $(TARGET_2) -lpthread
 run:
-	mpiexec -np 1 $(TARGET_1)
-	mpiexec -np 4 $(TARGET_2)
+	./$(TARGET_1)
+	./$(TARGET_2)
 
 clean:
 	rm -f -R *.o *.out *~ *.db *.aux *.gch *.log $(TARGET_1) $(TARGET_2)

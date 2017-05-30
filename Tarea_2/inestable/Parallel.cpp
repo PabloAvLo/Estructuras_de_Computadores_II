@@ -16,24 +16,42 @@
 #include "Functions.h"
 #include <string>
 #include <ctime>
-#include "mpi.h"
-
+#include <thread>
 using namespace std;
+
+void clustering(float* procData, float elements[], int x, int length){
+	// La siguiente funcionalidad devuelve un arreglo de strings, compuesto por los
+	// nombres de los elementos encontrados al procesar los datos de Wavelength
+	for (int i = x*length; i < ((x+1)*length+1); i++){
+		if ((procData[i] < Oxygen_WL + Oxygen_TL) 			&& (procData[i] > Oxygen_WL - Oxygen_TL)){
+			elements[0] +=1;
+		}
+		else if ((procData[i] < Hydro_a_WL + Hydro_a_TL) && (procData[i] > Hydro_a_WL - Hydro_a_TL)){
+			elements[1] +=1;
+		}
+		else if ((procData[i] < Sodium_WL + Sodium_TL) 	&& (procData[i] > Sodium_WL - Sodium_TL)){
+			elements[2] +=1;
+		}
+		else if ((procData[i] < Iron_WL + Iron_TL) 			&& (procData[i] > Iron_WL - Iron_TL)){
+			elements[3] +=1;
+		}
+		else if ((procData[i] < Hydro_b_WL + Hydro_b_TL) && (procData[i] > Hydro_b_WL - Hydro_b_TL)){
+			elements[4] +=1;
+		}
+		else if ((procData[i] < Calcium_WL + Calcium_TL) && (procData[i] > Calcium_WL - Calcium_TL)){
+			elements[5] +=1;
+		}
+		else{
+			elements[6] +=1;
+		}
+	}
+}
 
 int main(int argc, char* argv[]){
 
 	clock_t start;
-	clock_t start_Parallel;
 	double duration;
-	double duration_Parallel;
 	start = clock();
-
-	// Declaro variables para paralelizar
-	int procs; 												 // Cantidad de procesos a utilizar
-	int id; 	 												 // Identificador del proceso actaul
-	int largo; 												 // Longitud del proceso actual
-	int rc;														 // Grupo al que pertenecen los procesos
-	char host[MPI_MAX_PROCESSOR_NAME]; // Nombre del proceso principal
 
 	Functions Func;
 	int sizeFile;
@@ -41,11 +59,7 @@ int main(int argc, char* argv[]){
 	//Archivo a leer
 	string fileData = "dataProximaCentauri.csv";
 	sizeFile = Func.getFileLines(fileData);
-	int procLength = sizeFile/procs; // Cantidad de elementos para cada proceso.
-
-	// Se hace una arraglo clasificando cada medicion como un elemento quimico
-	string PCentauriElements[sizeFile];
-	float procData[procLength+1];
+	int procLength = sizeFile/4; // Cantidad de elementos para cada proceso.
 
 	// Arreglo que contiene la longitud de onda de una medicion
 	// en cada fila, con un numero "sizeFile" de filas.
@@ -54,100 +68,42 @@ int main(int argc, char* argv[]){
 	//Se cuentan las lineas del archivo
 	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
 
-	// Inicializo el "Mundo" que contiene los procesos
-	rc = MPI_Init(&argc, &argv);
-
-	MPI_Status stat;
-
-	MPI_Comm_size(MPI_COMM_WORLD, &procs);
-	MPI_Comm_rank(MPI_COMM_WORLD, &id);
-	MPI_Get_processor_name(host, &largo);
-
-	MPI_Scatter(spectrumPCentauri, procLength, MPI_FLOAT, &procData, procLength, MPI_FLOAT, 0, MPI_COMM_WORLD);
-
-	start_Parallel = clock();
-	int oxygen =0;
-	int hydrogenAlpha =0;
-	int sodium =0;
-	int iron =0;
-	int hydrogenbeta =0;
-	int calcium =0;
-	int unknown =0;
-
-	// La siguiente funcionalidad devuelve un arreglo de strings, compuesto por los
-	// nombres de los elementos encontrados al procesar los datos de Wavelength
-	for (int i = 0; i < procLength; i++){
-		if ((procData[i] < Oxygen_WL + Oxygen_TL) 			&& (procData[i] > Oxygen_WL - Oxygen_TL)){
-			PCentauriElements[i] = "Oxygen";
-			oxygen +=1;
-		}
-		else if ((procData[i] < Hydro_a_WL + Hydro_a_TL) && (procData[i] > Hydro_a_WL - Hydro_a_TL)){
-			PCentauriElements[i] = "Hydrogen alpha";
-			hydrogenAlpha +=1;
-		}
-		else if ((procData[i] < Sodium_WL + Sodium_TL) 	&& (procData[i] > Sodium_WL - Sodium_TL)){
-			PCentauriElements[i] = "Neutral sodium";
-			sodium +=1;
-		}
-		else if ((procData[i] < Iron_WL + Iron_TL) 			&& (procData[i] > Iron_WL - Iron_TL)){
-			PCentauriElements[i] = "Neutral iron";
-			iron +=1;
-		}
-		else if ((procData[i] < Hydro_b_WL + Hydro_b_TL) && (procData[i] > Hydro_b_WL - Hydro_b_TL)){
-			PCentauriElements[i] = "Hydrogen beta";
-			hydrogenbeta +=1;
-		}
-		else if ((procData[i] < Calcium_WL + Calcium_TL) && (procData[i] > Calcium_WL - Calcium_TL)){
-			PCentauriElements[i] = "Ionized calcium";
-			calcium +=1;
-		}
-		else{
-			PCentauriElements[i] = "Unknown element";	//Elemento desconocido o WL no calza dentro de uno de los elementos conocidos
-			unknown +=1;
-		}
+	float elements1[7];
+	float elements2[7];
+	float elements3[7];
+	float elements4[7];
+	for(int i=0; i<7; i++){
+		elements1[i] =0;
+		elements2[i] =0;
+		elements3[i] =0;
+		elements4[i] =0;
 	}
 
-	int *oxygenT;
-	int *hydrogenAlphaT;
-	int *sodiumT;
-	int *ironT;
-	int *hydrogenbetaT;
-	int *calciumT;
-	int *unknownT;
+	std::thread first(clustering, spectrumPCentauri, elements1,0, procLength);
+	std::thread second(clustering, spectrumPCentauri,elements2, 1, procLength);
+	std::thread third(clustering, spectrumPCentauri, elements3,2, procLength);
+	std::thread fourth(clustering, spectrumPCentauri,elements4, 3, procLength);
 
-	if(id == 0) {
-		oxygenT 			 = new int;
-		hydrogenAlphaT = new int;
-		sodiumT 			 = new int;
-		ironT 				 = new int;
-		hydrogenbetaT  = new int;
-		calciumT 			 = new int;
-		unknownT 			 = new int;
+	first.join();
+	second.join();
+	third.join();
+	fourth.join();
+
+	for(int i=0; i<7; i++){
+		elements1[i] += elements2[i] + elements3[i] + elements4[i];
 	}
 
-	MPI_Reduce(&oxygen, oxygenT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&hydrogenAlpha, hydrogenAlphaT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&sodium, sodiumT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&iron, ironT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&hydrogenbeta, hydrogenbetaT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&calcium, calciumT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
-	MPI_Reduce(&unknown, unknownT, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
+	cout <<endl<< "----Parallel Algorithm STATS----" <<endl<<endl;
+	cout <<"     Oxygen:          "<< elements1[0] << endl;
+	cout <<"     Hydrogen Alpha:  "<< elements1[1] << endl;
+	cout <<"     Neutral Sodium:  "<< elements1[2] << endl;
+	cout <<"     Neutral Iron:    "<< elements1[3] << endl;
+	cout <<"     Hydrogen Beta:   "<< elements1[4] << endl;
+	cout <<"     Ionized Calcium: "<< elements1[5] << endl;
+	cout <<"     Unknown Element: "<< elements1[6] << endl;
 
-	MPI_Finalize();
-	if(id==0){
-		cout <<endl<< "----Parallel Algorithm STATS----" <<endl<<endl;
-		cout <<"     Oxygen:          "<< *oxygenT << endl;
-		cout <<"     Hydrogen Alpha:  "<< *hydrogenAlphaT << endl;
-		cout <<"     Neutral Sodium:  "<< *sodiumT << endl;
-		cout <<"     Neutral Iron:    "<< *ironT << endl;
-		cout <<"     Hydrogen Beta:   "<< *hydrogenbetaT << endl;
-		cout <<"     Ionized Calcium: "<< *calciumT << endl;
-		cout <<"     Unknown Element: "<< *unknownT << endl;
+	duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+	cout<<endl<<"     Total Parallel Time:   "<< duration <<" [s]" <<endl<<endl;
 
-		duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-		cout<<endl<<"     Total Parallel Time:   "<< duration <<" [s]" <<endl<<endl;
-		duration_Parallel = ( std::clock() - start_Parallel ) / (double) CLOCKS_PER_SEC;
-		cout<<endl<<"     Partial Parallel Time:   "<< duration_Parallel <<" [s]" <<endl<<endl;
-	}
 	return 0;
 }
