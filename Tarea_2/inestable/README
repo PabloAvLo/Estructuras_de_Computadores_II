@@ -1,0 +1,29 @@
+*********************************************************************************
+                           Universidad de Costa Rica
+                   Estructuras de Computadores Digitales II
+               Tarea 2: Paralelizacion de Clustering Data Mining
+                                  I Ciclo 2017
+
+                                   Makefile
+
+ Prof: Francisco Rivera
+ Authors: Pablo Avila B30724
+          Guido Armas B30647
+*********************************************************************************
+
+ESTRUCUTURA:
+
+	La tarea se compone de dos archivos principales Secuential.cpp y Parallel.cpp
+	los cuales contienen el mismo algoritmo de data mining tipo clustering usando
+	el método de grid. Básicamente el objetivo es encontrar la cantidad de 
+	mediciones de una estrella (Proxima Centauri) que corresponden a una determinada
+	longitud de onda. Para esto se implementa el algoritmo primero de manera
+	secuencial, y luego en forma paralela utilizando 4 cores, mediante la biblioteca
+	<thread> de C++. 
+
+UTILIZACION:
+	
+	Para correr estos archivos se creó un Makefile el cual tiene las siguientes funciones:
+		make		   > 	Compila archivos y crea los ejecutables (Parallel y Secuential).
+		make run   > 	Corre los ejecutables.
+		make clean >  Borra archivos temporales y ejecutables creados.
