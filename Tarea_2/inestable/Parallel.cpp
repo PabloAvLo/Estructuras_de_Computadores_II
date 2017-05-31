@@ -49,6 +49,7 @@ void clustering(float* procData, float elements[], int x, int length){
 
 int main(int argc, char* argv[]){
 
+	// Contador de tiempos se inicia para indicar el tiempo de ejecucion final
 	clock_t start;
 	double duration;
 	start = clock();
@@ -65,13 +66,15 @@ int main(int argc, char* argv[]){
 	// en cada fila, con un numero "sizeFile" de filas.
 	float* spectrumPCentauri;
 
-	//Se cuentan las lineas del archivo
+	// Se cuentan las lineas del archivo
 	spectrumPCentauri = Func.getFileData(fileData, sizeFile);
 
 	float elements1[7];
 	float elements2[7];
 	float elements3[7];
 	float elements4[7];
+
+	// Se inicializan los vectores a usar por cada thread
 	for(int i=0; i<7; i++){
 		elements1[i] =0;
 		elements2[i] =0;
@@ -79,20 +82,24 @@ int main(int argc, char* argv[]){
 		elements4[i] =0;
 	}
 
+	// Se divide la lectura de las longitudes de ondas en 4 threads
 	std::thread first(clustering, spectrumPCentauri, elements1,0, procLength);
 	std::thread second(clustering, spectrumPCentauri,elements2, 1, procLength);
 	std::thread third(clustering, spectrumPCentauri, elements3,2, procLength);
 	std::thread fourth(clustering, spectrumPCentauri,elements4, 3, procLength);
 
+	// Se indica que se ha terminado el threading y se pueden destruir los threads
 	first.join();
 	second.join();
 	third.join();
 	fourth.join();
 
+	// Concatenacion de los datos de los 4 threads en uno solo (elements1)
 	for(int i=0; i<7; i++){
 		elements1[i] += elements2[i] + elements3[i] + elements4[i];
 	}
 
+	// Despliegue de elementos encontrados y tiempo de ejecucion
 	cout <<endl<< "----Parallel Algorithm STATS----" <<endl<<endl;
 	cout <<"     Oxygen:          "<< elements1[0] << endl;
 	cout <<"     Hydrogen Alpha:  "<< elements1[1] << endl;

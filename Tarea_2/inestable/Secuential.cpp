@@ -21,6 +21,7 @@ using namespace std;
 
 int main(int argc, char* argv[]){
 
+// Contador de tiempos se inicia para indicar el tiempo de ejecucion final
 clock_t start;
 double duration;
 start = clock();
@@ -49,6 +50,7 @@ int hydrogenbeta =0;
 int calcium =0;
 int unknown =0;
 
+// Identificacion de los elementos mediante la longitud de onda (WL) y una tolerancia (TL)
 	for (int i = 0; i < sizeFile; i++){
 		if ((spectrumPCentauri[i] < Oxygen_WL + Oxygen_TL) 		  	&& (spectrumPCentauri[i] > Oxygen_WL - Oxygen_TL)){
 			PCentauriElements[i] = "Oxygen";
@@ -80,13 +82,7 @@ int unknown =0;
 		}
 	}
 
-	// for(int i=0; i<sizeFile; i++){
-	// 	// WL [nm], Flux [W/m2/nm]
-	// 	cout << "\nWave Length [nm]: " << spectrumPCentauri[i]<<endl;
-	// 	cout << "Element: ";
-	// 		cout << PCentauriElements[i]<<endl;
-	// }
-
+// Despliegue de elementos encontrados y tiempo de ejecucion
 	cout <<endl<< "-----Serial Algorithm STATS-----" <<endl<<endl;
 	cout <<"     Oxygen:          "<< oxygen << endl;
 	cout <<"     Hydrogen Alpha:  "<< hydrogenAlpha << endl;
